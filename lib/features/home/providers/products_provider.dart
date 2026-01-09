@@ -1,102 +1,83 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:uuid/uuid.dart';
 import '../models/product.dart';
+import '../repositories/product_repository.dart';
 
 part 'products_provider.g.dart';
 
-/// Products provider - manages product list
+/// Products provider - manages product list state with Supabase
 @riverpod
 class Products extends _$Products {
+  ProductRepository get _repository => ProductRepository();
+
   @override
-  List<Product> build() {
-    // Initialize with sample products
-    return _getSampleProducts();
+  Future<List<Product>> build() async {
+    return await _repository.getProducts();
   }
 
-  /// Get sample products for demonstration
-  List<Product> _getSampleProducts() {
-    const uuid = Uuid();
-    final now = DateTime.now();
+  /// Refresh products from database
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => _repository.getProducts());
+  }
 
-    return [
-      Product(
-        id: uuid.v4(),
-        name: 'Coffee',
-        description: 'Premium coffee blend',
-        price: 4.99,
-        stock: 50,
-        category: 'Beverages',
-        createdAt: now,
-        updatedAt: now,
-      ),
-      Product(
-        id: uuid.v4(),
-        name: 'Sandwich',
-        description: 'Fresh sandwich with vegetables',
-        price: 7.99,
-        stock: 30,
-        category: 'Food',
-        createdAt: now,
-        updatedAt: now,
-      ),
-      Product(
-        id: uuid.v4(),
-        name: 'Juice',
-        description: 'Fresh orange juice',
-        price: 3.99,
-        stock: 40,
-        category: 'Beverages',
-        createdAt: now,
-        updatedAt: now,
-      ),
-      Product(
-        id: uuid.v4(),
-        name: 'Salad',
-        description: 'Healthy green salad',
-        price: 6.99,
-        stock: 25,
-        category: 'Food',
-        createdAt: now,
-        updatedAt: now,
-      ),
-    ];
+  /// Search products
+  Future<void> searchProducts(String query) async {
+    if (query.isEmpty) {
+      await refresh();
+      return;
+    }
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => _repository.searchProducts(query));
   }
 
   /// Add a new product
-  void addProduct(Product product) {
-    state = [...state, product];
-  }
-
-  /// Update an existing product
-  void updateProduct(Product product) {
-    final index = state.indexWhere((p) => p.id == product.id);
-    if (index >= 0) {
-      state = [
-        ...state.sublist(0, index),
-        product,
-        ...state.sublist(index + 1),
-      ];
+  Future<void> addProduct(Product product) async {
+    try {
+      final newProduct = await _repository.createProduct(product);
+      state.whenData((products) {
+        state = AsyncValue.data([...products, newProduct]);
+      });
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
     }
   }
 
-  /// Delete a product
-  void deleteProduct(String productId) {
-    state = state.where((p) => p.id != productId).toList();
+  /// Update an existing product
+  Future<void> updateProduct(String id, Product product) async {
+    try {
+      final updatedProduct = await _repository.updateProduct(id, product);
+      state.whenData((products) {
+        state = AsyncValue.data([
+          for (final p in products)
+            if (p.id == id) updatedProduct else p,
+        ]);
+      });
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
   }
 
-  /// Search products by name
-  List<Product> searchProducts(String query) {
-    if (query.isEmpty) return state;
-
-    final lowerQuery = query.toLowerCase();
-    return state.where((product) {
-      return product.name.toLowerCase().contains(lowerQuery) ||
-          product.description.toLowerCase().contains(lowerQuery);
-    }).toList();
+  /// Remove a product (soft delete)
+  Future<void> removeProduct(String id) async {
+    try {
+      await _repository.deleteProduct(id);
+      state.whenData((products) {
+        state = AsyncValue.data(products.where((p) => p.id != id).toList());
+      });
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
   }
 
-  /// Filter products by category
-  List<Product> filterByCategory(String category) {
-    return state.where((product) => product.category == category).toList();
+  /// Get low stock products
+  Future<List<Product>> getLowStockProducts() async {
+    return await _repository.getLowStockProducts();
   }
+}
+
+/// Provider for realtime product updates
+@riverpod
+Stream<List<Product>> productsStream(ProductsStreamRef ref) {
+  final repository = ProductRepository();
+  return repository.watchProducts();
 }

@@ -14,7 +14,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final products = ref.watch(productsProvider);
+    final productsAsync = ref.watch(productsProvider);
     final cartItemCount = ref.watch(cartProvider).length;
 
     return Scaffold(
@@ -67,8 +67,10 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
       drawer: const AppDrawer(),
-      body: products.isEmpty
-          ? Center(
+      body: productsAsync.when(
+        data: (products) {
+          if (products.isEmpty) {
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -80,42 +82,76 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-            )
-          : LayoutBuilder(
-              builder: (context, constraints) {
-                // Responsive grid columns with better breakpoints
-                int crossAxisCount = 2;
-                double childAspectRatio = 0.75;
+            );
+          }
 
-                if (constraints.maxWidth > 1400) {
-                  crossAxisCount = 5;
-                  childAspectRatio = 0.8;
-                } else if (constraints.maxWidth > 1100) {
-                  crossAxisCount = 4;
-                  childAspectRatio = 0.78;
-                } else if (constraints.maxWidth > 800) {
-                  crossAxisCount = 3;
-                  childAspectRatio = 0.76;
-                } else if (constraints.maxWidth > 600) {
-                  crossAxisCount = 2;
-                  childAspectRatio = 0.75;
-                }
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              // Responsive grid columns with better breakpoints
+              int crossAxisCount = 2;
+              double childAspectRatio = 0.75;
 
-                return GridView.builder(
-                  padding: const EdgeInsets.all(20),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    childAspectRatio: childAspectRatio,
-                    crossAxisSpacing: 20,
-                    mainAxisSpacing: 20,
-                  ),
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    return ProductCard(product: products[index]);
-                  },
-                );
-              },
-            ),
+              if (constraints.maxWidth > 1400) {
+                crossAxisCount = 5;
+                childAspectRatio = 0.8;
+              } else if (constraints.maxWidth > 1100) {
+                crossAxisCount = 4;
+                childAspectRatio = 0.78;
+              } else if (constraints.maxWidth > 800) {
+                crossAxisCount = 3;
+                childAspectRatio = 0.76;
+              } else if (constraints.maxWidth > 600) {
+                crossAxisCount = 2;
+                childAspectRatio = 0.75;
+              }
+
+              return GridView.builder(
+                padding: const EdgeInsets.all(20),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  childAspectRatio: childAspectRatio,
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20,
+                ),
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  return ProductCard(product: products[index]);
+                },
+              );
+            },
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 64, color: AppTheme.errorColor),
+              const SizedBox(height: 16),
+              Text(
+                'Failed to load products',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.errorColor,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                error.toString(),
+                style: TextStyle(fontSize: 14, color: AppTheme.neutralDark),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: () => ref.invalidate(productsProvider),
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

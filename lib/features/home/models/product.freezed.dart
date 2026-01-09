@@ -26,10 +26,23 @@ mixin _$Product {
   String get description => throw _privateConstructorUsedError;
   double get price => throw _privateConstructorUsedError;
   int get stock => throw _privateConstructorUsedError;
+  String? get sku => throw _privateConstructorUsedError;
+  String? get barcode => throw _privateConstructorUsedError;
+  @JsonKey(name: 'category_id')
+  String? get categoryId => throw _privateConstructorUsedError;
+  double? get cost => throw _privateConstructorUsedError;
+  @JsonKey(name: 'min_stock')
+  int get minStock => throw _privateConstructorUsedError;
+  String get unit => throw _privateConstructorUsedError;
+  @JsonKey(name: 'image_url')
   String? get imageUrl => throw _privateConstructorUsedError;
-  String? get category => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_active')
   bool get isActive => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_by')
+  String? get createdBy => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Product to a JSON map.
@@ -52,11 +65,17 @@ abstract class $ProductCopyWith<$Res> {
     String description,
     double price,
     int stock,
-    String? imageUrl,
-    String? category,
-    bool isActive,
-    DateTime? createdAt,
-    DateTime? updatedAt,
+    String? sku,
+    String? barcode,
+    @JsonKey(name: 'category_id') String? categoryId,
+    double? cost,
+    @JsonKey(name: 'min_stock') int minStock,
+    String unit,
+    @JsonKey(name: 'image_url') String? imageUrl,
+    @JsonKey(name: 'is_active') bool isActive,
+    @JsonKey(name: 'created_by') String? createdBy,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
   });
 }
 
@@ -80,9 +99,15 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
     Object? description = null,
     Object? price = null,
     Object? stock = null,
+    Object? sku = freezed,
+    Object? barcode = freezed,
+    Object? categoryId = freezed,
+    Object? cost = freezed,
+    Object? minStock = null,
+    Object? unit = null,
     Object? imageUrl = freezed,
-    Object? category = freezed,
     Object? isActive = null,
+    Object? createdBy = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -108,18 +133,42 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
                 ? _value.stock
                 : stock // ignore: cast_nullable_to_non_nullable
                       as int,
+            sku: freezed == sku
+                ? _value.sku
+                : sku // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            barcode: freezed == barcode
+                ? _value.barcode
+                : barcode // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            categoryId: freezed == categoryId
+                ? _value.categoryId
+                : categoryId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            cost: freezed == cost
+                ? _value.cost
+                : cost // ignore: cast_nullable_to_non_nullable
+                      as double?,
+            minStock: null == minStock
+                ? _value.minStock
+                : minStock // ignore: cast_nullable_to_non_nullable
+                      as int,
+            unit: null == unit
+                ? _value.unit
+                : unit // ignore: cast_nullable_to_non_nullable
+                      as String,
             imageUrl: freezed == imageUrl
                 ? _value.imageUrl
                 : imageUrl // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            category: freezed == category
-                ? _value.category
-                : category // ignore: cast_nullable_to_non_nullable
                       as String?,
             isActive: null == isActive
                 ? _value.isActive
                 : isActive // ignore: cast_nullable_to_non_nullable
                       as bool,
+            createdBy: freezed == createdBy
+                ? _value.createdBy
+                : createdBy // ignore: cast_nullable_to_non_nullable
+                      as String?,
             createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -148,11 +197,17 @@ abstract class _$$ProductImplCopyWith<$Res> implements $ProductCopyWith<$Res> {
     String description,
     double price,
     int stock,
-    String? imageUrl,
-    String? category,
-    bool isActive,
-    DateTime? createdAt,
-    DateTime? updatedAt,
+    String? sku,
+    String? barcode,
+    @JsonKey(name: 'category_id') String? categoryId,
+    double? cost,
+    @JsonKey(name: 'min_stock') int minStock,
+    String unit,
+    @JsonKey(name: 'image_url') String? imageUrl,
+    @JsonKey(name: 'is_active') bool isActive,
+    @JsonKey(name: 'created_by') String? createdBy,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
   });
 }
 
@@ -175,9 +230,15 @@ class __$$ProductImplCopyWithImpl<$Res>
     Object? description = null,
     Object? price = null,
     Object? stock = null,
+    Object? sku = freezed,
+    Object? barcode = freezed,
+    Object? categoryId = freezed,
+    Object? cost = freezed,
+    Object? minStock = null,
+    Object? unit = null,
     Object? imageUrl = freezed,
-    Object? category = freezed,
     Object? isActive = null,
+    Object? createdBy = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -203,18 +264,42 @@ class __$$ProductImplCopyWithImpl<$Res>
             ? _value.stock
             : stock // ignore: cast_nullable_to_non_nullable
                   as int,
+        sku: freezed == sku
+            ? _value.sku
+            : sku // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        barcode: freezed == barcode
+            ? _value.barcode
+            : barcode // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        categoryId: freezed == categoryId
+            ? _value.categoryId
+            : categoryId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        cost: freezed == cost
+            ? _value.cost
+            : cost // ignore: cast_nullable_to_non_nullable
+                  as double?,
+        minStock: null == minStock
+            ? _value.minStock
+            : minStock // ignore: cast_nullable_to_non_nullable
+                  as int,
+        unit: null == unit
+            ? _value.unit
+            : unit // ignore: cast_nullable_to_non_nullable
+                  as String,
         imageUrl: freezed == imageUrl
             ? _value.imageUrl
             : imageUrl // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        category: freezed == category
-            ? _value.category
-            : category // ignore: cast_nullable_to_non_nullable
                   as String?,
         isActive: null == isActive
             ? _value.isActive
             : isActive // ignore: cast_nullable_to_non_nullable
                   as bool,
+        createdBy: freezed == createdBy
+            ? _value.createdBy
+            : createdBy // ignore: cast_nullable_to_non_nullable
+                  as String?,
         createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -237,11 +322,17 @@ class _$ProductImpl implements _Product {
     required this.description,
     required this.price,
     required this.stock,
-    this.imageUrl,
-    this.category,
-    this.isActive = true,
-    this.createdAt,
-    this.updatedAt,
+    this.sku,
+    this.barcode,
+    @JsonKey(name: 'category_id') this.categoryId,
+    this.cost,
+    @JsonKey(name: 'min_stock') this.minStock = 0,
+    this.unit = 'pcs',
+    @JsonKey(name: 'image_url') this.imageUrl,
+    @JsonKey(name: 'is_active') this.isActive = true,
+    @JsonKey(name: 'created_by') this.createdBy,
+    @JsonKey(name: 'created_at') this.createdAt,
+    @JsonKey(name: 'updated_at') this.updatedAt,
   });
 
   factory _$ProductImpl.fromJson(Map<String, dynamic> json) =>
@@ -258,20 +349,39 @@ class _$ProductImpl implements _Product {
   @override
   final int stock;
   @override
-  final String? imageUrl;
+  final String? sku;
   @override
-  final String? category;
+  final String? barcode;
+  @override
+  @JsonKey(name: 'category_id')
+  final String? categoryId;
+  @override
+  final double? cost;
+  @override
+  @JsonKey(name: 'min_stock')
+  final int minStock;
   @override
   @JsonKey()
+  final String unit;
+  @override
+  @JsonKey(name: 'image_url')
+  final String? imageUrl;
+  @override
+  @JsonKey(name: 'is_active')
   final bool isActive;
   @override
+  @JsonKey(name: 'created_by')
+  final String? createdBy;
+  @override
+  @JsonKey(name: 'created_at')
   final DateTime? createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
 
   @override
   String toString() {
-    return 'Product(id: $id, name: $name, description: $description, price: $price, stock: $stock, imageUrl: $imageUrl, category: $category, isActive: $isActive, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Product(id: $id, name: $name, description: $description, price: $price, stock: $stock, sku: $sku, barcode: $barcode, categoryId: $categoryId, cost: $cost, minStock: $minStock, unit: $unit, imageUrl: $imageUrl, isActive: $isActive, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -285,12 +395,20 @@ class _$ProductImpl implements _Product {
                 other.description == description) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.stock, stock) || other.stock == stock) &&
+            (identical(other.sku, sku) || other.sku == sku) &&
+            (identical(other.barcode, barcode) || other.barcode == barcode) &&
+            (identical(other.categoryId, categoryId) ||
+                other.categoryId == categoryId) &&
+            (identical(other.cost, cost) || other.cost == cost) &&
+            (identical(other.minStock, minStock) ||
+                other.minStock == minStock) &&
+            (identical(other.unit, unit) || other.unit == unit) &&
             (identical(other.imageUrl, imageUrl) ||
                 other.imageUrl == imageUrl) &&
-            (identical(other.category, category) ||
-                other.category == category) &&
             (identical(other.isActive, isActive) ||
                 other.isActive == isActive) &&
+            (identical(other.createdBy, createdBy) ||
+                other.createdBy == createdBy) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -306,9 +424,15 @@ class _$ProductImpl implements _Product {
     description,
     price,
     stock,
+    sku,
+    barcode,
+    categoryId,
+    cost,
+    minStock,
+    unit,
     imageUrl,
-    category,
     isActive,
+    createdBy,
     createdAt,
     updatedAt,
   );
@@ -334,11 +458,17 @@ abstract class _Product implements Product {
     required final String description,
     required final double price,
     required final int stock,
-    final String? imageUrl,
-    final String? category,
-    final bool isActive,
-    final DateTime? createdAt,
-    final DateTime? updatedAt,
+    final String? sku,
+    final String? barcode,
+    @JsonKey(name: 'category_id') final String? categoryId,
+    final double? cost,
+    @JsonKey(name: 'min_stock') final int minStock,
+    final String unit,
+    @JsonKey(name: 'image_url') final String? imageUrl,
+    @JsonKey(name: 'is_active') final bool isActive,
+    @JsonKey(name: 'created_by') final String? createdBy,
+    @JsonKey(name: 'created_at') final DateTime? createdAt,
+    @JsonKey(name: 'updated_at') final DateTime? updatedAt,
   }) = _$ProductImpl;
 
   factory _Product.fromJson(Map<String, dynamic> json) = _$ProductImpl.fromJson;
@@ -354,14 +484,33 @@ abstract class _Product implements Product {
   @override
   int get stock;
   @override
+  String? get sku;
+  @override
+  String? get barcode;
+  @override
+  @JsonKey(name: 'category_id')
+  String? get categoryId;
+  @override
+  double? get cost;
+  @override
+  @JsonKey(name: 'min_stock')
+  int get minStock;
+  @override
+  String get unit;
+  @override
+  @JsonKey(name: 'image_url')
   String? get imageUrl;
   @override
-  String? get category;
-  @override
+  @JsonKey(name: 'is_active')
   bool get isActive;
   @override
+  @JsonKey(name: 'created_by')
+  String? get createdBy;
+  @override
+  @JsonKey(name: 'created_at')
   DateTime? get createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   DateTime? get updatedAt;
 
   /// Create a copy of Product
