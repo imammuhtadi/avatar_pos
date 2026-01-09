@@ -1,83 +1,47 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/product.dart';
 import '../repositories/product_repository.dart';
 
-part 'products_provider.g.dart';
+/// Repository provider
+final productRepositoryProvider = Provider<ProductRepository>((ref) {
+  return ProductRepository();
+});
 
-/// Products provider - manages product list state with Supabase
-@riverpod
-class Products extends _$Products {
-  ProductRepository get _repository => ProductRepository();
+/// Products provider - fetches all products from Supabase
+final productsProvider = FutureProvider<List<Product>>((ref) async {
+  final repository = ref.read(productRepositoryProvider);
+  return await repository.getProducts();
+});
 
-  @override
-  Future<List<Product>> build() async {
-    return await _repository.getProducts();
-  }
+/// Search query provider
+final searchQueryProvider = StateProvider<String>((ref) => '');
 
-  /// Refresh products from database
-  Future<void> refresh() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _repository.getProducts());
-  }
+/// Filtered products based on search query
+final filteredProductsProvider = Provider<AsyncValue<List<Product>>>((ref) {
+  final query = ref.watch(searchQueryProvider);
+  final productsAsync = ref.watch(productsProvider);
 
-  /// Search products
-  Future<void> searchProducts(String query) async {
-    if (query.isEmpty) {
-      await refresh();
-      return;
-    }
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _repository.searchProducts(query));
-  }
+  if (query.isEmpty) return productsAsync;
 
-  /// Add a new product
-  Future<void> addProduct(Product product) async {
-    try {
-      final newProduct = await _repository.createProduct(product);
-      state.whenData((products) {
-        state = AsyncValue.data([...products, newProduct]);
-      });
-    } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
-    }
-  }
-
-  /// Update an existing product
-  Future<void> updateProduct(String id, Product product) async {
-    try {
-      final updatedProduct = await _repository.updateProduct(id, product);
-      state.whenData((products) {
-        state = AsyncValue.data([
-          for (final p in products)
-            if (p.id == id) updatedProduct else p,
-        ]);
-      });
-    } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
-    }
-  }
-
-  /// Remove a product (soft delete)
-  Future<void> removeProduct(String id) async {
-    try {
-      await _repository.deleteProduct(id);
-      state.whenData((products) {
-        state = AsyncValue.data(products.where((p) => p.id != id).toList());
-      });
-    } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
-    }
-  }
-
-  /// Get low stock products
-  Future<List<Product>> getLowStockProducts() async {
-    return await _repository.getLowStockProducts();
-  }
-}
+  return productsAsync.whenData((products) {
+    return products
+        .where(
+          (p) =>
+              p.name.toLowerCase().contains(query.toLowerCase()) ||
+              p.description.toLowerCase().contains(query.toLowerCase()),
+        )
+        .toList();
+  });
+});
 
 /// Provider for realtime product updates
-@riverpod
-Stream<List<Product>> productsStream(ProductsStreamRef ref) {
-  final repository = ProductRepository();
+final productsStreamProvider = StreamProvider<List<Product>>((ref) {
+  final repository = ref.read(productRepositoryProvider);
   return repository.watchProducts();
-}
+});
+
+/// Low stock products provider
+final lowStockProductsProvider = FutureProvider<List<Product>>((ref) async {
+  final repository = ref.read(productRepositoryProvider);
+  return await repository.getLowStockProducts();
+});

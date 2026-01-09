@@ -1,22 +1,14 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/cart_item.dart';
 import '../models/product.dart';
 
-part 'cart_provider.g.dart';
-
-/// Cart state provider using Riverpod
-@riverpod
-class Cart extends _$Cart {
-  @override
-  List<CartItem> build() {
-    return [];
-  }
+/// Cart state notifier - manages shopping cart
+class CartNotifier extends StateNotifier<List<CartItem>> {
+  CartNotifier() : super([]);
 
   /// Add product to cart
   void addProduct(Product product) {
-    final existingIndex = state.indexWhere(
-      (item) => item.product.id == product.id,
-    );
+    final existingIndex = state.indexWhere((item) => item.product.id == product.id);
 
     if (existingIndex >= 0) {
       // Product already in cart, increase quantity
@@ -49,11 +41,7 @@ class Cart extends _$Cart {
     final index = state.indexWhere((item) => item.product.id == productId);
     if (index >= 0) {
       final updatedItem = state[index].copyWith(quantity: quantity);
-      state = [
-        ...state.sublist(0, index),
-        updatedItem,
-        ...state.sublist(index + 1),
-      ];
+      state = [...state.sublist(0, index), updatedItem, ...state.sublist(index + 1)];
     }
   }
 
@@ -72,3 +60,20 @@ class Cart extends _$Cart {
     return state.fold(0, (sum, item) => sum + item.quantity);
   }
 }
+
+/// Cart provider
+final cartProvider = StateNotifierProvider<CartNotifier, List<CartItem>>((ref) {
+  return CartNotifier();
+});
+
+/// Cart total price provider
+final cartTotalProvider = Provider<double>((ref) {
+  final cart = ref.watch(cartProvider);
+  return cart.fold(0.0, (sum, item) => sum + item.totalPrice);
+});
+
+/// Cart item count provider
+final cartItemCountProvider = Provider<int>((ref) {
+  final cart = ref.watch(cartProvider);
+  return cart.fold(0, (sum, item) => sum + item.quantity);
+});
