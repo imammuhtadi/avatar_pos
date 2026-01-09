@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/app_drawer.dart';
 import '../providers/products_provider.dart';
 import '../providers/cart_provider.dart';
@@ -17,64 +18,96 @@ class HomeScreen extends ConsumerWidget {
     final cartItemCount = ref.watch(cartProvider).length;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Avatar POS'),
+        title: const Text('Products'),
         actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.shopping_cart),
-                onPressed: () => context.push(AppRouter.cart),
-              ),
-              if (cartItemCount > 0)
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
-                    ),
-                    child: Text(
-                      '$cartItemCount',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+          // Modern cart button with badge
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.shopping_bag_outlined),
+                  onPressed: () => context.push(AppRouter.cart),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                   ),
                 ),
-            ],
+                if (cartItemCount > 0)
+                  Positioned(
+                    right: 6,
+                    top: 6,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AppTheme.accentColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          width: 2,
+                        ),
+                      ),
+                      constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                      child: Text(
+                        '$cartItemCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       ),
       drawer: const AppDrawer(),
       body: products.isEmpty
-          ? const Center(child: Text('No products available'))
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.inventory_2_outlined, size: 64, color: AppTheme.neutralDark),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No products available',
+                    style: TextStyle(fontSize: 16, color: AppTheme.neutralDark),
+                  ),
+                ],
+              ),
+            )
           : LayoutBuilder(
               builder: (context, constraints) {
-                // Responsive grid columns
+                // Responsive grid columns with better breakpoints
                 int crossAxisCount = 2;
-                if (constraints.maxWidth > 1200) {
+                double childAspectRatio = 0.75;
+
+                if (constraints.maxWidth > 1400) {
+                  crossAxisCount = 5;
+                  childAspectRatio = 0.8;
+                } else if (constraints.maxWidth > 1100) {
                   crossAxisCount = 4;
+                  childAspectRatio = 0.78;
                 } else if (constraints.maxWidth > 800) {
                   crossAxisCount = 3;
+                  childAspectRatio = 0.76;
+                } else if (constraints.maxWidth > 600) {
+                  crossAxisCount = 2;
+                  childAspectRatio = 0.75;
                 }
 
                 return GridView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: crossAxisCount,
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
+                    childAspectRatio: childAspectRatio,
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
                   ),
                   itemCount: products.length,
                   itemBuilder: (context, index) {
