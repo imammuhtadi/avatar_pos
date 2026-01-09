@@ -89,129 +89,152 @@ class CartScreen extends ConsumerWidget {
                           ),
                         ),
                         padding: const EdgeInsets.all(12),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Product image placeholder - smaller
-                            Container(
-                              width: 56,
-                              height: 56,
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? Colors.white.withOpacity(0.03)
-                                    : AppTheme.neutralLight,
-                                borderRadius: BorderRadius.circular(10),
+                            // Title row - dedicated space for product name
+                            Text(
+                              item.product.name,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.3,
                               ),
-                              child: Icon(
-                                Icons.shopping_bag_outlined,
-                                size: 24,
-                                color: AppTheme.neutralDark.withOpacity(0.3),
-                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(height: 8),
 
-                            // Product info - more compact
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    item.product.name,
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: -0.3,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        '\$${item.product.price.toStringAsFixed(2)}',
-                                        style: TextStyle(fontSize: 13, color: AppTheme.neutralDark),
-                                      ),
-                                      Text(
-                                        ' × ${item.quantity}',
-                                        style: TextStyle(fontSize: 13, color: AppTheme.neutralDark),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '\$${item.totalPrice.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppTheme.accentColor,
-                                      letterSpacing: -0.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            // Quantity controls - more compact
+                            // Main content row - image, price, and controls
                             Row(
-                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                // Quantity adjuster
+                                // Product image placeholder
                                 Container(
+                                  width: 56,
+                                  height: 56,
                                   decoration: BoxDecoration(
                                     color: isDark
-                                        ? Colors.white.withOpacity(0.05)
+                                        ? Colors.white.withOpacity(0.03)
                                         : AppTheme.neutralLight,
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: Row(
+                                  child: Icon(
+                                    Icons.shopping_bag_outlined,
+                                    size: 24,
+                                    color: AppTheme.neutralDark.withOpacity(0.3),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+
+                                // Price info
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.remove, size: 16),
-                                        onPressed: () {
-                                          cart.updateQuantity(item.product.id, item.quantity - 1);
-                                        },
-                                        constraints: const BoxConstraints(
-                                          minWidth: 32,
-                                          minHeight: 32,
-                                        ),
-                                        padding: EdgeInsets.zero,
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                                        child: Text(
-                                          '${item.quantity}',
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '\$${item.product.price.toStringAsFixed(2)}',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: AppTheme.neutralDark,
+                                            ),
                                           ),
-                                        ),
+                                          Text(
+                                            ' × ${item.quantity}',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: AppTheme.neutralDark,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      IconButton(
-                                        icon: const Icon(Icons.add, size: 16),
-                                        onPressed: () {
-                                          cart.updateQuantity(item.product.id, item.quantity + 1);
-                                        },
-                                        constraints: const BoxConstraints(
-                                          minWidth: 32,
-                                          minHeight: 32,
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '\$${item.totalPrice.toStringAsFixed(2)}',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppTheme.accentColor,
+                                          letterSpacing: -0.5,
                                         ),
-                                        padding: EdgeInsets.zero,
                                       ),
                                     ],
                                   ),
                                 ),
-                                const SizedBox(width: 4),
-                                // Delete button
-                                IconButton(
-                                  icon: const Icon(Icons.delete_outline, size: 18),
-                                  onPressed: () {
-                                    cart.removeProduct(item.product.id);
-                                  },
-                                  color: AppTheme.errorColor,
-                                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                                  padding: EdgeInsets.zero,
+
+                                // Quantity controls
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Quantity adjuster
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: isDark
+                                            ? Colors.white.withOpacity(0.05)
+                                            : AppTheme.neutralLight,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            icon: const Icon(Icons.remove, size: 16),
+                                            onPressed: () {
+                                              cart.updateQuantity(
+                                                item.product.id,
+                                                item.quantity - 1,
+                                              );
+                                            },
+                                            constraints: const BoxConstraints(
+                                              minWidth: 32,
+                                              minHeight: 32,
+                                            ),
+                                            padding: EdgeInsets.zero,
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                                            child: Text(
+                                              '${item.quantity}',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.add, size: 16),
+                                            onPressed: () {
+                                              cart.updateQuantity(
+                                                item.product.id,
+                                                item.quantity + 1,
+                                              );
+                                            },
+                                            constraints: const BoxConstraints(
+                                              minWidth: 32,
+                                              minHeight: 32,
+                                            ),
+                                            padding: EdgeInsets.zero,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    // Delete button
+                                    IconButton(
+                                      icon: const Icon(Icons.delete_outline, size: 18),
+                                      onPressed: () {
+                                        cart.removeProduct(item.product.id);
+                                      },
+                                      color: AppTheme.errorColor,
+                                      constraints: const BoxConstraints(
+                                        minWidth: 32,
+                                        minHeight: 32,
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
