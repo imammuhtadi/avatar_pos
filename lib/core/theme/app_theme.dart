@@ -80,7 +80,9 @@ class AppTheme {
     // Input decoration
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: neutralLight,
+      fillColor: const Color(
+        0xFFF0F1F3,
+      ), // Slightly darker than neutralLight, lighter than neutralMedium
       hintStyle: const TextStyle(color: neutralDark, fontSize: 15, fontWeight: FontWeight.w400),
       labelStyle: const TextStyle(color: neutralDark, fontSize: 15, fontWeight: FontWeight.w500),
       border: OutlineInputBorder(
