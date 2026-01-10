@@ -1,25 +1,22 @@
-# 🛒 Avatar POS
+# Avatar POS
 
-> A modern, beautiful Point of Sale system that runs everywhere - from mobile to desktop to web.
+A modern Point of Sale system built with Flutter and Supabase. Runs on Android, iOS, Web, Windows, and macOS.
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.8.1+-02569B?logo=flutter)](https://flutter.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?logo=supabase)](https://supabase.com)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
-Built with **Flutter** and **Supabase**, Avatar POS is a fully-functional point of sale system designed for modern businesses. Clean architecture, beautiful UI, and truly cross-platform.
 
 ---
 
-## ✨ Features
+## Features
 
-- 🛍️ **Product Management** - Add, edit, and organize products with categories
-- 🛒 **Smart Cart** - Real-time cart with quantity management
-- 💳 **Checkout System** - Complete payment processing with receipt generation
-- 📊 **Transaction History** - Track all sales with detailed records
-- 🔐 **Authentication** - Secure login with Supabase Auth
-- 📦 **Stock Management** - Automatic stock updates and low-stock alerts
-- 🎨 **Beautiful UI** - Modern, minimal design with light/dark themes
-- 🌍 **Multi-Platform** - Runs on Android, iOS, Web, Windows, and macOS
+- 🛍️ Product management with categories
+- 🛒 Shopping cart with quantity management
+- 💳 Checkout and payment processing
+- 📊 Transaction history
+- 🔐 User authentication (Supabase Auth)
+- 📦 Automatic stock management
+- 🎨 Light/dark theme support
+- 🌍 Cross-platform (Android, iOS, Web, Windows, macOS)
 
 ---
 
@@ -57,11 +54,26 @@ flutter pub get
 
 # Run code generation
 dart run build_runner build --delete-conflicting-outputs
+```
 
-# Set up Supabase (see supabase/SUPABASE_SETUP.md)
-# Create .env file with your Supabase credentials
+### Supabase Setup
 
-# Run the app
+Complete Supabase setup instructions are in the `supabase/` folder:
+
+📁 **[supabase/SUPABASE_SETUP.md](supabase/SUPABASE_SETUP.md)** - Complete database setup guide including:
+
+- Creating Supabase project
+- Database tables and schema
+- Functions and triggers
+- Row Level Security (RLS) policies
+- Sample data
+- Environment variables setup
+
+After setting up Supabase, create a `.env` file in the project root with your credentials.
+
+### Run the App
+
+```bash
 flutter run -d chrome  # or macos, windows, android, ios
 ```
 
@@ -188,29 +200,24 @@ dart run build_runner build --delete-conflicting-outputs
 5. Add routes in `core/router/app_router.dart`
 6. Run code generation
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 **Frontend:**
 
-- **Flutter** - Beautiful, natively compiled applications
-- **Riverpod** - Robust state management with code generation
-- **GoRouter** - Type-safe navigation with deep linking
-- **Freezed** - Immutable models with code generation
+- Flutter 3.8.1+
+- flutter_riverpod - State management
+- go_router - Navigation
+- freezed - Code generation for models
 
 **Backend:**
 
-- **Supabase** - Open-source Firebase alternative
-  - PostgreSQL database
-  - Real-time subscriptions
-  - Row Level Security (RLS)
-  - Built-in authentication
-  - Auto-generated REST API
+- Supabase - PostgreSQL database, authentication, and REST API
 
-**Code Quality:**
+**Other:**
 
-- **build_runner** - Automated code generation
-- **flutter_lints** - Recommended linting rules
-- Clean architecture with feature-first structure
+- shared_preferences - Local storage
+- flutter_dotenv - Environment variables
+- intl - Internationalization
 
 ## 🧪 Testing
 
@@ -258,44 +265,10 @@ Contributions are welcome! Whether it's:
 
 ---
 
-## ⭐ Show Your Support
+## License
 
-If you find this project helpful, please consider:
+MIT License - see [LICENSE](LICENSE) file for details.
 
-- ⭐ **Starring** the repository
-- 🍴 **Forking** it for your own projects
-- 📢 **Sharing** it with others
-- 🐛 **Reporting** bugs or suggesting features
+## Author
 
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👨‍💻 Author
-
-**Imam Muhtadi**
-
-- GitHub: [@imammuhtadi](https://github.com/imammuhtadi)
-
----
-
-## 🙏 Acknowledgments
-
-- [Flutter](https://flutter.dev) team for the amazing framework
-- [Supabase](https://supabase.com) for the excellent backend platform
-- [Riverpod](https://riverpod.dev) for robust state management
-- All contributors and supporters
-
----
-
-<div align="center">
-
-**Built with ❤️ using Flutter**
-
-[Report Bug](https://github.com/imammuhtadi/avatar_pos/issues) · [Request Feature](https://github.com/imammuhtadi/avatar_pos/issues)
-
-</div>
+Imam Muhtadi - [@imammuhtadi](https://github.com/imammuhtadi)
