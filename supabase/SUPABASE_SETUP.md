@@ -143,7 +143,32 @@ CREATE INDEX idx_stock_movements_date ON stock_movements(created_at);
 #### Step 2: Create Functions and Triggers
 
 ```sql
+-- Function to automatically create user record when auth user is created
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS handle_new_user();
+
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.users (id, email, full_name, role)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
+    'cashier'
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to create user record on auth signup
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
 -- Function to update updated_at timestamp
+DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
+
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -166,6 +191,8 @@ CREATE TRIGGER update_transactions_updated_at BEFORE UPDATE ON transactions
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Function to generate transaction number
+DROP FUNCTION IF EXISTS generate_transaction_number();
+
 CREATE OR REPLACE FUNCTION generate_transaction_number()
 RETURNS TEXT AS $$
 DECLARE
@@ -186,6 +213,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Function to update stock after transaction
+DROP TRIGGER IF EXISTS trigger_update_stock_after_transaction ON transactions;
+DROP FUNCTION IF EXISTS update_stock_after_transaction();
+
 CREATE OR REPLACE FUNCTION update_stock_after_transaction()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -233,51 +263,83 @@ ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE transaction_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE stock_movements ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies for products (read for all, write for admin/manager)
+-- RLS Policies for products (read for all, write for authenticated users)
+DROP POLICY IF EXISTS "Anyone can read products" ON products;
 CREATE POLICY "Anyone can read products" ON products
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can insert products" ON products;
 CREATE POLICY "Authenticated users can insert products" ON products
   FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Authenticated users can update products" ON products;
 CREATE POLICY "Authenticated users can update products" ON products
   FOR UPDATE USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Authenticated users can delete products" ON products;
+CREATE POLICY "Authenticated users can delete products" ON products
+  FOR DELETE USING (auth.role() = 'authenticated');
+
 -- RLS Policies for categories
+DROP POLICY IF EXISTS "Anyone can read categories" ON categories;
 CREATE POLICY "Anyone can read categories" ON categories
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can manage categories" ON categories;
 CREATE POLICY "Authenticated users can manage categories" ON categories
   FOR ALL USING (auth.role() = 'authenticated');
 
 -- RLS Policies for transactions
-CREATE POLICY "Users can read own transactions" ON transactions
-  FOR SELECT USING (auth.uid() = cashier_id);
+DROP POLICY IF EXISTS "Authenticated users can read transactions" ON transactions;
+CREATE POLICY "Authenticated users can read transactions" ON transactions
+  FOR SELECT USING (auth.role() = 'authenticated');
 
-CREATE POLICY "Users can create transactions" ON transactions
-  FOR INSERT WITH CHECK (auth.uid() = cashier_id);
+DROP POLICY IF EXISTS "Authenticated users can create transactions" ON transactions;
+CREATE POLICY "Authenticated users can create transactions" ON transactions
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
 -- RLS Policies for transaction_items
-CREATE POLICY "Users can read transaction items" ON transaction_items
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM transactions
-      WHERE transactions.id = transaction_items.transaction_id
-      AND transactions.cashier_id = auth.uid()
-    )
-  );
+DROP POLICY IF EXISTS "Authenticated users can read transaction items" ON transaction_items;
+CREATE POLICY "Authenticated users can read transaction items" ON transaction_items
+  FOR SELECT USING (auth.role() = 'authenticated');
 
-CREATE POLICY "Users can insert transaction items" ON transaction_items
-  FOR INSERT WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM transactions
-      WHERE transactions.id = transaction_items.transaction_id
-      AND transactions.cashier_id = auth.uid()
-    )
-  );
+DROP POLICY IF EXISTS "Authenticated users can insert transaction items" ON transaction_items;
+CREATE POLICY "Authenticated users can insert transaction items" ON transaction_items
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 ```
 
-#### Step 4: Insert Sample Data
+#### Step 4: Create Authentication User & Insert Sample Data
+
+**First, create a user account for authentication:**
+
+1. Go to Supabase Dashboard → **Authentication** → **Users**
+2. Click **Add User**
+3. Fill in:
+   - **Email**: your@email.com
+   - **Password**: your-secure-password (min 6 characters)
+4. Click **Create User**
+5. **Copy the User ID** from the users list (you'll need it for the next step)
+
+**Important: Insert the user into the users table:**
+
+If you created the user **before** adding the trigger in Step 2, you need to manually insert them:
+
+```sql
+-- Replace 'YOUR_USER_ID' with the actual UUID from Authentication → Users
+-- Replace 'your@email.com' with your actual email
+INSERT INTO public.users (id, email, full_name, role)
+VALUES (
+  'YOUR_USER_ID'::uuid,
+  'your@email.com',
+  'Your Name',
+  'cashier'
+)
+ON CONFLICT (id) DO NOTHING;
+```
+
+**Note:** New users created after Step 2 will be automatically added to the users table by the trigger.
+
+**Then, insert sample data:**
 
 ```sql
 -- Insert sample categories
@@ -624,6 +686,10 @@ void testSupabaseConnection() async {
 ### Issue: Authentication errors
 
 **Solution**: Verify your API keys are correct and not expired
+
+### Issue: RLS blocking inserts/updates
+
+**Solution**: Make sure you've created a user account (Step 4) and logged in to the app. The app requires authentication to create/update products and transactions
 
 ---
 

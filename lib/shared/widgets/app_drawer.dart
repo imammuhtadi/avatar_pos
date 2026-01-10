@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_theme.dart';
+import '../../features/auth/providers/auth_provider.dart';
 
 /// Modern, minimalist navigation drawer
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final userAsync = ref.watch(currentUserProvider);
 
     return Drawer(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -117,6 +120,22 @@ class AppDrawer extends StatelessWidget {
                       Navigator.pop(context);
                     },
                   ),
+
+                  const SizedBox(height: 8),
+
+                  // Logout button
+                  _DrawerItem(
+                    icon: Icons.logout,
+                    activeIcon: Icons.logout,
+                    label: 'Logout',
+                    onTap: () async {
+                      final repository = ref.read(authRepositoryProvider);
+                      await repository.signOut();
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
                 ],
               ),
             ),
@@ -131,34 +150,41 @@ class AppDrawer extends StatelessWidget {
                   ),
                 ),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.white.withOpacity(0.05) : AppTheme.neutralLight,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.person_outline, size: 20, color: AppTheme.neutralDark),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Guest User',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              child: userAsync.when(
+                loading: () => const SizedBox.shrink(),
+                error: (_, __) => const SizedBox.shrink(),
+                data: (user) {
+                  return Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: AppTheme.accentColor.withOpacity(0.1),
+                          shape: BoxShape.circle,
                         ),
-                        Text(
-                          'Not signed in',
-                          style: TextStyle(fontSize: 12, color: AppTheme.neutralDark),
+                        child: Icon(Icons.person, size: 20, color: AppTheme.accentColor),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user?.email ?? 'Guest',
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              'Signed in',
+                              style: TextStyle(fontSize: 12, color: AppTheme.successColor),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                ],
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ],

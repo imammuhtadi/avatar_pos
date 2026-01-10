@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../config/supabase_config.dart';
+import '../../features/auth/screens/login_screen.dart';
 import '../../features/home/screens/home_screen.dart';
 import '../../features/products/screens/products_screen.dart';
 import '../../features/cart/screens/cart_screen.dart';
@@ -8,6 +10,7 @@ import '../../features/transactions/screens/transactions_screen.dart';
 
 /// Application router configuration using go_router
 class AppRouter {
+  static const String login = '/login';
   static const String home = '/';
   static const String products = '/products';
   static const String cart = '/cart';
@@ -16,7 +19,30 @@ class AppRouter {
 
   static final GoRouter router = GoRouter(
     initialLocation: home,
+    redirect: (context, state) {
+      final isLoggedIn = supabase.auth.currentUser != null;
+      final isLoginRoute = state.matchedLocation == login;
+
+      // If not logged in and not on login page, redirect to login
+      if (!isLoggedIn && !isLoginRoute) {
+        return login;
+      }
+
+      // If logged in and on login page, redirect to home
+      if (isLoggedIn && isLoginRoute) {
+        return home;
+      }
+
+      // No redirect needed
+      return null;
+    },
     routes: [
+      GoRoute(
+        path: login,
+        name: 'login',
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: const LoginScreen()),
+      ),
       GoRoute(
         path: home,
         name: 'home',
