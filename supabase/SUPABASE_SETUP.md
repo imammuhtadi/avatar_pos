@@ -1,21 +1,43 @@
 # Supabase Setup Guide - Avatar POS
 
-## Quick Start Guide
+Complete database setup for the Avatar POS system including tables, functions, triggers, and security policies.
 
-### 1. Create Supabase Project
+---
+
+## 📋 Table of Contents
+
+1. [Create Supabase Project](#1-create-supabase-project)
+2. [Run Database Migrations](#2-run-database-migrations)
+   - [Step 1: Create Core Tables](#step-1-create-core-tables)
+   - [Step 2: Create Functions and Triggers](#step-2-create-functions-and-triggers)
+   - [Step 3: Enable Row Level Security](#step-3-enable-row-level-security)
+   - [Step 4: Create User & Insert Sample Data](#step-4-create-authentication-user--insert-sample-data)
+3. [Configure Flutter App](#3-configure-flutter-app)
+4. [Common Issues](#common-issues)
+
+---
+
+## 1. Create Supabase Project
+
+**Instructions:**
 
 1. Go to [https://supabase.com](https://supabase.com)
 2. Sign up or log in
-3. Click "New Project"
+3. Click **"New Project"**
 4. Fill in:
-   - **Project Name**: avatar-pos
-   - **Database Password**: (save this securely!)
+   - **Project Name**: `avatar-pos`
+   - **Database Password**: Save this securely!
    - **Region**: Choose closest to your users
-   - **Pricing Plan**: Free tier is fine for development
+   - **Pricing Plan**: Free tier (for development)
+5. Wait for project to finish setting up (~2 minutes)
 
-### 2. Run Database Migrations
+---
 
-Go to **SQL Editor** in your Supabase dashboard and run these scripts in order:
+## 2. Run Database Migrations
+
+**Instructions:**
+
+Go to **SQL Editor** in your Supabase dashboard and run these SQL scripts **in order**:
 
 #### Step 1: Create Core Tables
 
@@ -140,7 +162,20 @@ CREATE INDEX idx_stock_movements_type ON stock_movements(movement_type);
 CREATE INDEX idx_stock_movements_date ON stock_movements(created_at);
 ```
 
+---
+
 #### Step 2: Create Functions and Triggers
+
+**What this does:**
+
+- Auto-creates user records when someone signs up
+- Updates `updated_at` timestamps automatically
+- Generates unique transaction numbers
+- Handles stock updates after transactions
+- Processes complete checkout transactions
+- Provides helper functions for querying transactions
+
+**SQL to run:**
 
 ```sql
 -- Function to automatically create user record when auth user is created
@@ -250,9 +285,210 @@ CREATE TRIGGER trigger_update_stock_after_transaction
   AFTER INSERT OR UPDATE ON transactions
   FOR EACH ROW
   EXECUTE FUNCTION update_stock_after_transaction();
+
+-- Checkout function - Process complete checkout transaction
+DROP FUNCTION IF EXISTS process_checkout CASCADE;
+
+CREATE OR REPLACE FUNCTION process_checkout(
+  p_cashier_id UUID DEFAULT NULL,
+  p_items JSONB DEFAULT '[]'::JSONB,
+  p_payment_method TEXT DEFAULT 'cash',
+  p_customer_name TEXT DEFAULT NULL,
+  p_customer_phone TEXT DEFAULT NULL,
+  p_customer_email TEXT DEFAULT NULL,
+  p_paid_amount DECIMAL DEFAULT NULL,
+  p_notes TEXT DEFAULT NULL
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_transaction_id UUID;
+  v_transaction_number TEXT;
+  v_subtotal DECIMAL := 0;
+  v_tax DECIMAL := 0;
+  v_discount DECIMAL := 0;
+  v_total DECIMAL := 0;
+  v_change_amount DECIMAL := 0;
+  v_item JSONB;
+  v_product_price DECIMAL;
+  v_product_stock INTEGER;
+  v_result JSONB;
+BEGIN
+  -- Generate transaction number
+  v_transaction_number := 'TRX-' || TO_CHAR(NOW(), 'YYYYMMDD') || '-' ||
+                          LPAD(FLOOR(RANDOM() * 99999)::TEXT, 5, '0');
+
+  -- Calculate subtotal and validate stock
+  FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
+  LOOP
+    SELECT price, stock INTO v_product_price, v_product_stock
+    FROM products
+    WHERE id = (v_item->>'product_id')::UUID AND is_active = true;
+
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'Product % not found or inactive', v_item->>'product_id';
+    END IF;
+
+    IF v_product_stock < (v_item->>'quantity')::INTEGER THEN
+      RAISE EXCEPTION 'Insufficient stock for product %', v_item->>'product_id';
+    END IF;
+
+    v_subtotal := v_subtotal + (v_product_price * (v_item->>'quantity')::INTEGER);
+  END LOOP;
+
+  -- Calculate tax (10%)
+  v_tax := v_subtotal * 0.10;
+  v_total := v_subtotal + v_tax - v_discount;
+
+  -- Calculate change
+  IF p_paid_amount IS NOT NULL THEN
+    v_change_amount := p_paid_amount - v_total;
+    IF v_change_amount < 0 THEN
+      RAISE EXCEPTION 'Insufficient payment amount';
+    END IF;
+  END IF;
+
+  -- Create transaction
+  INSERT INTO transactions (
+    transaction_number, cashier_id, customer_name, customer_phone, customer_email,
+    subtotal, tax, discount, total, payment_method, payment_status,
+    paid_amount, change_amount, notes
+  ) VALUES (
+    v_transaction_number, p_cashier_id, p_customer_name, p_customer_phone, p_customer_email,
+    v_subtotal, v_tax, v_discount, v_total, p_payment_method, 'completed',
+    p_paid_amount, v_change_amount, p_notes
+  ) RETURNING id INTO v_transaction_id;
+
+  -- Create transaction items and update stock
+  FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
+  LOOP
+    SELECT price INTO v_product_price
+    FROM products WHERE id = (v_item->>'product_id')::UUID;
+
+    INSERT INTO transaction_items (
+      transaction_id, product_id, product_name, total, quantity, unit_price, subtotal
+    )
+    SELECT
+      v_transaction_id, (v_item->>'product_id')::UUID, p.name,
+      v_product_price * (v_item->>'quantity')::INTEGER,
+      (v_item->>'quantity')::INTEGER, v_product_price,
+      v_product_price * (v_item->>'quantity')::INTEGER
+    FROM products p WHERE p.id = (v_item->>'product_id')::UUID;
+
+    UPDATE products
+    SET stock = stock - (v_item->>'quantity')::INTEGER, updated_at = NOW()
+    WHERE id = (v_item->>'product_id')::UUID;
+  END LOOP;
+
+  -- Return complete transaction with items
+  SELECT jsonb_build_object(
+    'transaction', row_to_json(t.*),
+    'items', (
+      SELECT jsonb_agg(row_to_json(ti.*))
+      FROM transaction_items ti WHERE ti.transaction_id = v_transaction_id
+    )
+  ) INTO v_result
+  FROM transactions t WHERE t.id = v_transaction_id;
+
+  RETURN v_result;
+END;
+$$;
+
+-- Helper functions for transactions
+DROP FUNCTION IF EXISTS get_transaction_with_items CASCADE;
+DROP FUNCTION IF EXISTS get_today_transactions CASCADE;
+DROP FUNCTION IF EXISTS get_all_transactions CASCADE;
+DROP FUNCTION IF EXISTS get_sales_summary CASCADE;
+
+CREATE OR REPLACE FUNCTION get_transaction_with_items(p_transaction_id UUID)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE v_result JSONB;
+BEGIN
+  SELECT jsonb_build_object(
+    'transaction', row_to_json(t.*),
+    'items', (
+      SELECT jsonb_agg(row_to_json(ti.*))
+      FROM transaction_items ti WHERE ti.transaction_id = p_transaction_id
+    )
+  ) INTO v_result FROM transactions t WHERE t.id = p_transaction_id;
+  RETURN v_result;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION get_today_transactions()
+RETURNS SETOF transactions LANGUAGE sql SECURITY DEFINER AS $$
+  SELECT * FROM transactions
+  WHERE DATE(created_at) = CURRENT_DATE
+  ORDER BY created_at DESC;
+$$;
+
+CREATE OR REPLACE FUNCTION get_all_transactions(
+  p_limit INTEGER DEFAULT 50,
+  p_offset INTEGER DEFAULT 0
+)
+RETURNS SETOF transactions LANGUAGE sql SECURITY DEFINER AS $$
+  SELECT * FROM transactions
+  ORDER BY created_at DESC
+  LIMIT p_limit OFFSET p_offset;
+$$;
+
+CREATE OR REPLACE FUNCTION get_sales_summary(
+  p_start_date TIMESTAMPTZ DEFAULT NULL,
+  p_end_date TIMESTAMPTZ DEFAULT NULL
+)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  v_start_date TIMESTAMPTZ;
+  v_end_date TIMESTAMPTZ;
+  v_result JSONB;
+BEGIN
+  v_start_date := COALESCE(p_start_date, CURRENT_DATE);
+  v_end_date := COALESCE(p_end_date, CURRENT_DATE + INTERVAL '1 day');
+
+  SELECT jsonb_build_object(
+    'total_transactions', COUNT(*),
+    'total_revenue', COALESCE(SUM(total), 0),
+    'total_tax', COALESCE(SUM(tax), 0),
+    'total_discount', COALESCE(SUM(discount), 0),
+    'payment_methods', (
+      SELECT jsonb_object_agg(payment_method, jsonb_build_object('count', count, 'total', total))
+      FROM (
+        SELECT payment_method, COUNT(*) as count, SUM(total) as total
+        FROM transactions
+        WHERE created_at >= v_start_date AND created_at < v_end_date
+        GROUP BY payment_method
+      ) pm
+    )
+  ) INTO v_result
+  FROM transactions
+  WHERE created_at >= v_start_date AND created_at < v_end_date;
+
+  RETURN v_result;
+END;
+$$;
+
+-- Grant permissions to authenticated users
+GRANT EXECUTE ON FUNCTION process_checkout TO authenticated;
+GRANT EXECUTE ON FUNCTION get_transaction_with_items TO authenticated;
+GRANT EXECUTE ON FUNCTION get_today_transactions TO authenticated;
+GRANT EXECUTE ON FUNCTION get_all_transactions TO authenticated;
+GRANT EXECUTE ON FUNCTION get_sales_summary TO authenticated;
 ```
 
+---
+
 #### Step 3: Enable Row Level Security
+
+**What this does:**
+
+- Enables Row Level Security (RLS) on all tables
+- Sets up policies to control who can read/write data
+- Requires authentication for creating/updating products and transactions
+- Allows anyone to read products and categories
+
+**SQL to run:**
 
 ```sql
 -- Enable RLS on all tables
@@ -308,21 +544,31 @@ CREATE POLICY "Authenticated users can insert transaction items" ON transaction_
   FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 ```
 
+---
+
 #### Step 4: Create Authentication User & Insert Sample Data
 
-**First, create a user account for authentication:**
+**What this does:**
+
+- Creates your first user account for logging in
+- Inserts the user into the `users` table
+- Adds sample categories and products for testing
+
+**Instructions:**
+
+**A. Create User Account:**
 
 1. Go to Supabase Dashboard → **Authentication** → **Users**
-2. Click **Add User**
+2. Click **"Add User"**
 3. Fill in:
-   - **Email**: your@email.com
-   - **Password**: your-secure-password (min 6 characters)
-4. Click **Create User**
-5. **Copy the User ID** from the users list (you'll need it for the next step)
+   - **Email**: `your@email.com`
+   - **Password**: `your-secure-password` (min 6 characters)
+4. Click **"Create User"**
+5. **Copy the User ID** from the users list
 
-**Important: Insert the user into the users table:**
+**B. Insert User into Users Table:**
 
-If you created the user **before** adding the trigger in Step 2, you need to manually insert them:
+If you created the user **before** running Step 2, manually insert them with this SQL:
 
 ```sql
 -- Replace 'YOUR_USER_ID' with the actual UUID from Authentication → Users
@@ -337,9 +583,11 @@ VALUES (
 ON CONFLICT (id) DO NOTHING;
 ```
 
-**Note:** New users created after Step 2 will be automatically added to the users table by the trigger.
+> **Note:** New users created **after** Step 2 will be automatically added to the `users` table by the trigger.
 
-**Then, insert sample data:**
+**C. Insert Sample Data:**
+
+Run this SQL to add sample categories and products:
 
 ```sql
 -- Insert sample categories
@@ -357,7 +605,13 @@ INSERT INTO products (name, description, sku, price, stock, category_id) VALUES
   ('Bluetooth Speaker', 'Portable waterproof speaker', 'ELEC-004', 45.99, 30, (SELECT id FROM categories WHERE name = 'Electronics'));
 ```
 
-### 3. Get API Keys
+---
+
+## 3. Configure Flutter App
+
+### Get API Keys
+
+**Instructions:**
 
 1. Go to **Project Settings** → **API**
 2. Copy these keys:
@@ -365,331 +619,50 @@ INSERT INTO products (name, description, sku, price, stock, category_id) VALUES
    - **anon public key**: For client-side use
    - **service_role key**: For server-side use (keep secret!)
 
-### 4. Install Flutter Package
+### Setup Environment Variables
 
-Add to `pubspec.yaml`:
+**Instructions:**
 
-```yaml
-dependencies:
-  supabase_flutter: ^2.0.0
-```
-
-Run:
-
-```bash
-flutter pub get
-```
-
-### 5. Initialize Supabase in Flutter
-
-Create `lib/core/config/supabase_config.dart`:
-
-```dart
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-class SupabaseConfig {
-  static const String supabaseUrl = 'YOUR_SUPABASE_URL';
-  static const String supabaseAnonKey = 'YOUR_ANON_KEY';
-
-  static Future<void> initialize() async {
-    await Supabase.initialize(
-      url: supabaseUrl,
-      anonKey: supabaseAnonKey,
-      authOptions: const FlutterAuthClientOptions(
-        authFlowType: AuthFlowType.pkce,
-      ),
-    );
-  }
-}
-
-// Global accessor
-final supabase = Supabase.instance.client;
-```
-
-Update `lib/main.dart`:
-
-```dart
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'core/config/supabase_config.dart';
-import 'core/router/app_router.dart';
-import 'core/theme/app_theme.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Supabase
-  await SupabaseConfig.initialize();
-
-  runApp(const ProviderScope(child: MyApp()));
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Avatar POS',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      routerConfig: appRouter,
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-```
-
-### 6. Create Repository Layer
-
-Create `lib/features/products/repositories/product_repository.dart`:
-
-```dart
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/config/supabase_config.dart';
-import '../../home/models/product.dart';
-
-class ProductRepository {
-  final SupabaseClient _supabase = supabase;
-
-  // Fetch all products
-  Future<List<Product>> getProducts() async {
-    try {
-      final response = await _supabase
-          .from('products')
-          .select('*, categories(name)')
-          .eq('is_active', true)
-          .order('name');
-
-      return (response as List)
-          .map((json) => Product.fromJson(json))
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to fetch products: $e');
-    }
-  }
-
-  // Fetch single product
-  Future<Product?> getProduct(String id) async {
-    try {
-      final response = await _supabase
-          .from('products')
-          .select('*, categories(name)')
-          .eq('id', id)
-          .single();
-
-      return Product.fromJson(response);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  // Create product
-  Future<Product> createProduct(Product product) async {
-    try {
-      final response = await _supabase
-          .from('products')
-          .insert(product.toJson())
-          .select()
-          .single();
-
-      return Product.fromJson(response);
-    } catch (e) {
-      throw Exception('Failed to create product: $e');
-    }
-  }
-
-  // Update product
-  Future<Product> updateProduct(String id, Product product) async {
-    try {
-      final response = await _supabase
-          .from('products')
-          .update(product.toJson())
-          .eq('id', id)
-          .select()
-          .single();
-
-      return Product.fromJson(response);
-    } catch (e) {
-      throw Exception('Failed to update product: $e');
-    }
-  }
-
-  // Delete product (soft delete)
-  Future<void> deleteProduct(String id) async {
-    try {
-      await _supabase
-          .from('products')
-          .update({'is_active': false})
-          .eq('id', id);
-    } catch (e) {
-      throw Exception('Failed to delete product: $e');
-    }
-  }
-
-  // Search products
-  Future<List<Product>> searchProducts(String query) async {
-    try {
-      final response = await _supabase
-          .from('products')
-          .select('*, categories(name)')
-          .or('name.ilike.%$query%,sku.ilike.%$query%,barcode.ilike.%$query%')
-          .eq('is_active', true)
-          .order('name');
-
-      return (response as List)
-          .map((json) => Product.fromJson(json))
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to search products: $e');
-    }
-  }
-
-  // Get low stock products
-  Future<List<Product>> getLowStockProducts() async {
-    try {
-      final response = await _supabase
-          .from('products')
-          .select('*, categories(name)')
-          .lte('stock', 'min_stock')
-          .eq('is_active', true)
-          .order('stock');
-
-      return (response as List)
-          .map((json) => Product.fromJson(json))
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to fetch low stock products: $e');
-    }
-  }
-
-  // Listen to product changes (realtime)
-  Stream<List<Product>> watchProducts() {
-    return _supabase
-        .from('products')
-        .stream(primaryKey: ['id'])
-        .eq('is_active', true)
-        .order('name')
-        .map((data) => data.map((json) => Product.fromJson(json)).toList());
-  }
-}
-```
-
-### 7. Update Product Provider
-
-Update `lib/features/home/providers/products_provider.dart`:
-
-```dart
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../models/product.dart';
-import '../../products/repositories/product_repository.dart';
-
-part 'products_provider.g.dart';
-
-@riverpod
-class Products extends _$Products {
-  late final ProductRepository _repository;
-
-  @override
-  Future<List<Product>> build() async {
-    _repository = ProductRepository();
-    return await _repository.getProducts();
-  }
-
-  Future<void> refresh() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _repository.getProducts());
-  }
-
-  Future<void> searchProducts(String query) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _repository.searchProducts(query));
-  }
-}
-```
-
-### 8. Environment Variables (Recommended)
-
-Create `.env` file:
+1. Create a `.env` file in your project root:
 
 ```env
 SUPABASE_URL=https://xxxxx.supabase.co
 SUPABASE_ANON_KEY=your_anon_key_here
 ```
 
-Add to `.gitignore`:
+2. Add `.env` to your `.gitignore` file (already done in this project)
 
-```
-.env
-```
+3. Replace the values with your actual Supabase URL and anon key from Step 3
 
-Install `flutter_dotenv`:
-
-```yaml
-dependencies:
-  flutter_dotenv: ^5.1.0
-```
-
-Load in `main.dart`:
-
-```dart
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
-  await SupabaseConfig.initialize();
-  runApp(const ProviderScope(child: MyApp()));
-}
-```
+> **Note:** The Flutter app code already includes all necessary Supabase configuration, repositories, and providers. Check the `lib/` folder for implementation details.
 
 ---
 
-## Testing the Setup
+## 4. Common Issues
 
-### Test in Supabase Dashboard
+### ❌ RLS blocking queries
 
-1. Go to **Table Editor**
-2. View your tables and sample data
-3. Try inserting/updating records manually
+**Solution:** Check your RLS policies or temporarily disable for testing
 
-### Test in Flutter App
+### ❌ CORS errors on web
 
-```dart
-// Test connection
-void testSupabaseConnection() async {
-  try {
-    final products = await supabase.from('products').select();
-    debugPrint('Connected! Found ${products.length} products');
-  } catch (e) {
-    debugPrint('Connection failed: $e');
-  }
-}
-```
+**Solution:** Add your domain to allowed origins in Supabase dashboard
 
----
+### ❌ Connection timeout
 
-## Common Issues & Solutions
+**Solution:** Check your internet connection and Supabase project status
 
-### Issue: RLS blocking queries
+### ❌ Authentication errors
 
-**Solution**: Check your RLS policies or temporarily disable for testing
+**Solution:** Verify your API keys are correct and not expired
 
-### Issue: CORS errors on web
+### ❌ RLS blocking inserts/updates
 
-**Solution**: Add your domain to allowed origins in Supabase dashboard
+**Solution:** Make sure you've created a user account (Step 4) and logged in to the app. The app requires authentication to create/update products and transactions
 
-### Issue: Connection timeout
+### ❌ Foreign key constraint violation (cashier_id)
 
-**Solution**: Check your internet connection and Supabase project status
-
-### Issue: Authentication errors
-
-**Solution**: Verify your API keys are correct and not expired
-
-### Issue: RLS blocking inserts/updates
-
-**Solution**: Make sure you've created a user account (Step 4) and logged in to the app. The app requires authentication to create/update products and transactions
+**Solution:** Your user exists in `auth.users` but not in `public.users`. Run the SQL in Step 4B to insert your user into the users table
 
 ---
 
