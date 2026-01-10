@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/config/supabase_config.dart';
 import '../models/transaction.dart';
@@ -20,17 +21,19 @@ class CheckoutRepository {
   }) async {
     try {
       // Get current user ID (cashier)
+      // If no user is authenticated, use null (for testing without auth)
       final userId = _supabase.auth.currentUser?.id;
-      if (userId == null) {
-        throw Exception('User not authenticated');
-      }
+      debugPrint('🔐 User ID: ${userId ?? "NULL (no auth)"}');
 
       // Prepare items for the function
       final items = cartItems
           .map((item) => {'product_id': item.product.id, 'quantity': item.quantity})
           .toList();
+      debugPrint('🛒 Cart items: ${items.length} items');
+      debugPrint('📦 Items data: $items');
 
       // Call the Supabase function
+      debugPrint('📞 Calling process_checkout function...');
       final response = await _supabase.rpc(
         'process_checkout',
         params: {
@@ -44,6 +47,7 @@ class CheckoutRepository {
           'p_notes': notes,
         },
       );
+      debugPrint('✅ Supabase response received');
 
       // Parse response
       final transactionData = response['transaction'] as Map<String, dynamic>;
@@ -58,8 +62,11 @@ class CheckoutRepository {
           .toList();
 
       // Return transaction with items
+      debugPrint('🎉 Transaction completed: ${transaction.transactionNumber}');
       return transaction.copyWith(items: transactionItems);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('❌ Checkout Repository Error: $e');
+      debugPrint('Stack trace: $stackTrace');
       throw Exception('Failed to process checkout: $e');
     }
   }

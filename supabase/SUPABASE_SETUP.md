@@ -598,9 +598,9 @@ void main() async {
 void testSupabaseConnection() async {
   try {
     final products = await supabase.from('products').select();
-    print('Connected! Found ${products.length} products');
+    debugPrint('Connected! Found ${products.length} products');
   } catch (e) {
-    print('Connection failed: $e');
+    debugPrint('Connection failed: $e');
   }
 }
 ```

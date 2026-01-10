@@ -66,10 +66,18 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         Navigator.of(context).pop(); // Close checkout screen
         _showSuccessDialog(transaction);
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Log error to console for debugging
+      debugPrint('❌ Checkout Error: $e');
+      debugPrint('Stack trace: $stackTrace');
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Checkout failed: $e'), backgroundColor: AppTheme.errorColor),
+          SnackBar(
+            content: Text('Checkout failed: $e'),
+            backgroundColor: AppTheme.errorColor,
+            duration: const Duration(seconds: 5),
+          ),
         );
       }
     } finally {

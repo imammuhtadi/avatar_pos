@@ -16,9 +16,9 @@ This function handles the entire checkout process atomically:
 ```sql
 -- Function to process checkout
 CREATE OR REPLACE FUNCTION process_checkout(
-  p_cashier_id UUID,
-  p_items JSONB,
-  p_payment_method TEXT,
+  p_cashier_id UUID DEFAULT NULL,
+  p_items JSONB DEFAULT '[]'::JSONB,
+  p_payment_method TEXT DEFAULT 'cash',
   p_customer_name TEXT DEFAULT NULL,
   p_customer_phone TEXT DEFAULT NULL,
   p_customer_email TEXT DEFAULT NULL,
@@ -127,6 +127,7 @@ BEGIN
       transaction_id,
       product_id,
       product_name,
+      total,
       quantity,
       unit_price,
       subtotal
@@ -135,6 +136,7 @@ BEGIN
       v_transaction_id,
       (v_item->>'product_id')::UUID,
       p.name,
+      v_product_price * (v_item->>'quantity')::INTEGER,
       (v_item->>'quantity')::INTEGER,
       v_product_price,
       v_product_price * (v_item->>'quantity')::INTEGER
