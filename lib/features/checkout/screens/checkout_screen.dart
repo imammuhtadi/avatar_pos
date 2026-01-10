@@ -22,6 +22,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   bool _isProcessing = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Add listener to rebuild UI when paid amount changes
+    _paidAmountController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
   void dispose() {
     _customerNameController.dispose();
     _customerPhoneController.dispose();
@@ -259,40 +268,67 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    if (_paidAmountController.text.isNotEmpty)
-                      Builder(
-                        builder: (context) {
-                          final paid = double.tryParse(_paidAmountController.text) ?? 0;
-                          final change = paid - total;
-                          if (change >= 0) {
-                            return Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: AppTheme.successColor.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
+                    // Reactive change display
+                    Builder(
+                      builder: (context) {
+                        final paid = double.tryParse(_paidAmountController.text) ?? 0;
+                        final change = paid - total;
+
+                        // Determine color and message based on amount
+                        Color bgColor;
+                        Color textColor;
+                        String label;
+
+                        if (_paidAmountController.text.isEmpty || paid == 0) {
+                          bgColor = Colors.grey.withOpacity(0.1);
+                          textColor = Colors.grey;
+                          label = 'Change';
+                        } else if (change < 0) {
+                          bgColor = AppTheme.errorColor.withOpacity(0.1);
+                          textColor = AppTheme.errorColor;
+                          label = 'Insufficient (Need \$${(-change).toStringAsFixed(2)} more)';
+                        } else if (change == 0) {
+                          bgColor = Colors.blue.withOpacity(0.1);
+                          textColor = Colors.blue;
+                          label = 'Exact Amount';
+                        } else {
+                          bgColor = AppTheme.successColor.withOpacity(0.1);
+                          textColor = AppTheme.successColor;
+                          label = 'Change';
+                        }
+
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: bgColor,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: textColor.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                label,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: textColor,
+                                ),
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    'Change',
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                              if (change >= 0 && _paidAmountController.text.isNotEmpty)
+                                Text(
+                                  '\$${change.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: textColor,
                                   ),
-                                  Text(
-                                    '\$${change.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppTheme.successColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                     const SizedBox(height: 24),
 
                     // Customer Info (Optional)
