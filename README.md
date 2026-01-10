@@ -1,6 +1,85 @@
-# Avatar POS
+# 🛒 Avatar POS
 
-A modern, cross-platform Point of Sale (POS) system built with Flutter. Supports Android, iOS, Web, Windows, and macOS.
+> A modern, beautiful Point of Sale system that runs everywhere - from mobile to desktop to web.
+
+[![Flutter](https://img.shields.io/badge/Flutter-3.8.1+-02569B?logo=flutter)](https://flutter.dev)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?logo=supabase)](https://supabase.com)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+Built with **Flutter** and **Supabase**, Avatar POS is a fully-functional point of sale system designed for modern businesses. Clean architecture, beautiful UI, and truly cross-platform.
+
+---
+
+## ✨ Features
+
+- 🛍️ **Product Management** - Add, edit, and organize products with categories
+- 🛒 **Smart Cart** - Real-time cart with quantity management
+- 💳 **Checkout System** - Complete payment processing with receipt generation
+- 📊 **Transaction History** - Track all sales with detailed records
+- 🔐 **Authentication** - Secure login with Supabase Auth
+- 📦 **Stock Management** - Automatic stock updates and low-stock alerts
+- 🎨 **Beautiful UI** - Modern, minimal design with light/dark themes
+- 🌍 **Multi-Platform** - Runs on Android, iOS, Web, Windows, and macOS
+
+---
+
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td><img src="screenshots/iPhone.png" alt="Mobile View" /></td>
+    <td><img src="screenshots/chrome.png" alt="Web View" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Mobile (iOS/Android)</b></td>
+    <td align="center"><b>Web (Chrome/Safari/Firefox)</b></td>
+  </tr>
+</table>
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- [Flutter SDK](https://flutter.dev/docs/get-started/install) (3.8.1 or higher)
+- [Supabase Account](https://supabase.com) (free tier works great!)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/imammuhtadi/avatar_pos.git
+cd avatar_pos
+
+# Install dependencies
+flutter pub get
+
+# Run code generation
+dart run build_runner build --delete-conflicting-outputs
+
+# Set up Supabase (see supabase/SUPABASE_SETUP.md)
+# Create .env file with your Supabase credentials
+
+# Run the app
+flutter run -d chrome  # or macos, windows, android, ios
+```
+
+---
+
+## 🌐 Cross-Platform Support
+
+Avatar POS runs seamlessly on **all major platforms**:
+
+| Platform       | Status   | Notes                         |
+| -------------- | -------- | ----------------------------- |
+| 🌐 **Web**     | ✅ Ready | Chrome, Safari, Firefox, Edge |
+| 🍎 **macOS**   | ✅ Ready | Native desktop app            |
+| 🪟 **Windows** | ✅ Ready | Native desktop app            |
+| 📱 **Android** | ✅ Ready | Phone & Tablet                |
+| 📱 **iOS**     | ✅ Ready | iPhone & iPad                 |
+
+---
 
 ## 🏗️ Architecture
 
@@ -109,58 +188,29 @@ dart run build_runner build --delete-conflicting-outputs
 5. Add routes in `core/router/app_router.dart`
 6. Run code generation
 
-## 📦 Dependencies
+## 🛠️ Tech Stack
 
-### Production
+**Frontend:**
 
-- **flutter_riverpod** - State management
-- **go_router** - Routing
-- **freezed_annotation** - Code generation annotations
-- **json_annotation** - JSON serialization
-- **shared_preferences** - Local storage (cross-platform)
-- **intl** - Internationalization
-- **uuid** - Unique ID generation
+- **Flutter** - Beautiful, natively compiled applications
+- **Riverpod** - Robust state management with code generation
+- **GoRouter** - Type-safe navigation with deep linking
+- **Freezed** - Immutable models with code generation
 
-### Development
+**Backend:**
 
-- **build_runner** - Code generation runner
-- **freezed** - Code generator for models
-- **json_serializable** - JSON code generator
-- **riverpod_generator** - Riverpod code generator
-- **flutter_lints** - Linting rules
+- **Supabase** - Open-source Firebase alternative
+  - PostgreSQL database
+  - Real-time subscriptions
+  - Row Level Security (RLS)
+  - Built-in authentication
+  - Auto-generated REST API
 
-## 🌐 Cross-Platform Support
+**Code Quality:**
 
-This app is designed to work seamlessly across:
-
-- ✅ **Android** (Mobile & Tablet)
-- ✅ **iOS** (iPhone & iPad)
-- ✅ **Web** (Desktop & Mobile browsers)
-- ✅ **Windows** (Desktop)
-- ✅ **macOS** (Desktop)
-
-All dependencies are carefully selected to ensure cross-platform compatibility.
-
-## 🎨 Features
-
-### Current
-
-- ✅ Product catalog with grid view
-- ✅ Shopping cart management
-- ✅ Responsive UI (adapts to screen size)
-- ✅ Cross-platform navigation
-- ✅ Theme support (light/dark)
-
-### Planned
-
-- 🔲 Product CRUD operations
-- 🔲 Transaction history
-- 🔲 Receipt generation
-- 🔲 Inventory management
-- 🔲 User authentication
-- 🔲 Payment integration
-- 🔲 Barcode scanning
-- 🔲 Reports and analytics
+- **build_runner** - Automated code generation
+- **flutter_lints** - Recommended linting rules
+- Clean architecture with feature-first structure
 
 ## 🧪 Testing
 
@@ -191,22 +241,61 @@ flutter test --coverage
 
 ## 🤝 Contributing
 
+Contributions are welcome! Whether it's:
+
+- 🐛 Bug reports
+- 💡 Feature requests
+- 📝 Documentation improvements
+- 🔧 Code contributions
+
+**How to contribute:**
+
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## ⭐ Show Your Support
+
+If you find this project helpful, please consider:
+
+- ⭐ **Starring** the repository
+- 🍴 **Forking** it for your own projects
+- 📢 **Sharing** it with others
+- 🐛 **Reporting** bugs or suggesting features
+
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Authors
+---
 
-- Imam muhtadi - Initial work
+## 👨‍💻 Author
+
+**Imam Muhtadi**
+
+- GitHub: [@imammuhtadi](https://github.com/imammuhtadi)
+
+---
 
 ## 🙏 Acknowledgments
 
-- Flutter team for the amazing framework
-- Riverpod for excellent state management
-- Community contributors
+- [Flutter](https://flutter.dev) team for the amazing framework
+- [Supabase](https://supabase.com) for the excellent backend platform
+- [Riverpod](https://riverpod.dev) for robust state management
+- All contributors and supporters
+
+---
+
+<div align="center">
+
+**Built with ❤️ using Flutter**
+
+[Report Bug](https://github.com/imammuhtadi/avatar_pos/issues) · [Request Feature](https://github.com/imammuhtadi/avatar_pos/issues)
+
+</div>
