@@ -109,11 +109,10 @@ class CheckoutRepository {
   /// Get all transactions with pagination
   Future<List<Transaction>> getTransactions({int limit = 50, int offset = 0}) async {
     try {
-      final response = await _supabase
-          .from('transactions')
-          .select()
-          .order('created_at', ascending: false)
-          .range(offset, offset + limit - 1);
+      final response = await _supabase.rpc(
+        'get_all_transactions',
+        params: {'p_limit': limit, 'p_offset': offset},
+      );
 
       return (response as List)
           .map((json) => Transaction.fromJson(json as Map<String, dynamic>))

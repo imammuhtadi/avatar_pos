@@ -4,12 +4,14 @@ import '../../features/home/screens/home_screen.dart';
 import '../../features/products/screens/products_screen.dart';
 import '../../features/cart/screens/cart_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
+import '../../features/transactions/screens/transactions_screen.dart';
 
 /// Application router configuration using go_router
 class AppRouter {
   static const String home = '/';
   static const String products = '/products';
   static const String cart = '/cart';
+  static const String transactions = '/transactions';
   static const String settings = '/settings';
 
   static final GoRouter router = GoRouter(
@@ -32,6 +34,12 @@ class AppRouter {
         name: 'cart',
         pageBuilder: (context, state) =>
             MaterialPage(key: state.pageKey, child: const CartScreen()),
+      ),
+      GoRoute(
+        path: transactions,
+        name: 'transactions',
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: const TransactionsScreen()),
       ),
       GoRoute(
         path: settings,

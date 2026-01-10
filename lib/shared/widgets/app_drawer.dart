@@ -84,6 +84,15 @@ class AppDrawer extends StatelessWidget {
                       Navigator.pop(context);
                     },
                   ),
+                  _DrawerItem(
+                    icon: Icons.receipt_long_outlined,
+                    activeIcon: Icons.receipt_long,
+                    label: 'Transactions',
+                    onTap: () {
+                      context.push(AppRouter.transactions);
+                      Navigator.pop(context);
+                    },
+                  ),
 
                   const SizedBox(height: 16),
                   Padding(

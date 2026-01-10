@@ -207,6 +207,22 @@ AS $$
   ORDER BY created_at DESC;
 $$;
 
+-- Function to get all transactions with pagination
+CREATE OR REPLACE FUNCTION get_all_transactions(
+  p_limit INTEGER DEFAULT 50,
+  p_offset INTEGER DEFAULT 0
+)
+RETURNS SETOF transactions
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  SELECT *
+  FROM transactions
+  ORDER BY created_at DESC
+  LIMIT p_limit
+  OFFSET p_offset;
+$$;
+
 -- Function to get sales summary
 CREATE OR REPLACE FUNCTION get_sales_summary(
   p_start_date TIMESTAMPTZ DEFAULT NULL,
@@ -265,6 +281,7 @@ $$;
 GRANT EXECUTE ON FUNCTION process_checkout TO authenticated;
 GRANT EXECUTE ON FUNCTION get_transaction_with_items TO authenticated;
 GRANT EXECUTE ON FUNCTION get_today_transactions TO authenticated;
+GRANT EXECUTE ON FUNCTION get_all_transactions TO authenticated;
 GRANT EXECUTE ON FUNCTION get_sales_summary TO authenticated;
 ```
 
