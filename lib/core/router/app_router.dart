@@ -8,6 +8,16 @@ import '../../features/cart/screens/cart_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/transactions/screens/transactions_screen.dart';
 
+/// Notifier to refresh GoRouter when auth state changes
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream() {
+    // Listen to Supabase auth state changes
+    supabase.auth.onAuthStateChange.listen((data) {
+      notifyListeners(); // Tell GoRouter to re-evaluate routes
+    });
+  }
+}
+
 /// Application router configuration using go_router
 class AppRouter {
   static const String login = '/login';
@@ -17,8 +27,11 @@ class AppRouter {
   static const String transactions = '/transactions';
   static const String settings = '/settings';
 
+  static final _refreshStream = GoRouterRefreshStream();
+
   static final GoRouter router = GoRouter(
     initialLocation: home,
+    refreshListenable: _refreshStream, // Listen to auth changes
     redirect: (context, state) {
       final isLoggedIn = supabase.auth.currentUser != null;
       final isLoginRoute = state.matchedLocation == login;
