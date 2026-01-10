@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../home/providers/cart_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../checkout/screens/checkout_screen.dart';
 
 /// Modern cart screen with clean design
 class CartScreen extends ConsumerWidget {
@@ -296,21 +297,8 @@ class CartScreen extends ConsumerWidget {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Row(
-                                    children: [
-                                      Icon(Icons.info_outline, color: Colors.white, size: 20),
-                                      SizedBox(width: 12),
-                                      Text('Checkout - Coming Soon'),
-                                    ],
-                                  ),
-                                  backgroundColor: AppTheme.accentColor,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (context) => const CheckoutScreen()),
                               );
                             },
                             child: const Padding(
