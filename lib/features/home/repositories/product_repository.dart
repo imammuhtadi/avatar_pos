@@ -37,7 +37,11 @@ class ProductRepository {
   /// Create new product
   Future<Product> createProduct(Product product) async {
     try {
-      final response = await _supabase.from('products').insert(product.toJson()).select().single();
+      // Convert to JSON and remove id field to let Supabase auto-generate it
+      final productJson = product.toJson();
+      productJson.remove('id');
+
+      final response = await _supabase.from('products').insert(productJson).select().single();
 
       return Product.fromJson(response);
     } catch (e) {
