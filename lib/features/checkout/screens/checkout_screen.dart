@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../home/providers/cart_provider.dart';
+import '../../home/providers/products_provider.dart';
 import '../repositories/checkout_repository.dart';
 import '../models/transaction.dart';
 
@@ -69,6 +70,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
       // Clear cart
       ref.read(cartProvider.notifier).clear();
+
+      // Invalidate products provider to refresh stock
+      ref.invalidate(productsProvider);
+      ref.invalidate(lowStockProductsProvider);
 
       // Show success and navigate to receipt
       if (mounted) {
