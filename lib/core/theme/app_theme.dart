@@ -81,6 +81,8 @@ class AppTheme {
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: neutralLight,
+      hintStyle: const TextStyle(color: neutralDark, fontSize: 15, fontWeight: FontWeight.w400),
+      labelStyle: const TextStyle(color: neutralDark, fontSize: 15, fontWeight: FontWeight.w500),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
@@ -162,6 +164,16 @@ class AppTheme {
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: const Color(0xFF262626),
+      hintStyle: const TextStyle(
+        color: Color(0xFF6B7280),
+        fontSize: 15,
+        fontWeight: FontWeight.w400,
+      ),
+      labelStyle: const TextStyle(
+        color: Color(0xFF9CA3AF),
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
