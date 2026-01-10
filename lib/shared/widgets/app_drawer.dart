@@ -79,6 +79,15 @@ class AppDrawer extends ConsumerWidget {
                     },
                   ),
                   _DrawerItem(
+                    icon: Icons.category_outlined,
+                    activeIcon: Icons.category,
+                    label: 'Categories',
+                    onTap: () {
+                      context.push(AppRouter.categories);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  _DrawerItem(
                     icon: Icons.shopping_bag_outlined,
                     activeIcon: Icons.shopping_bag,
                     label: 'Cart',

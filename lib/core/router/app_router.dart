@@ -7,6 +7,7 @@ import '../../features/products/screens/products_screen.dart';
 import '../../features/cart/screens/cart_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/transactions/screens/transactions_screen.dart';
+import '../../features/categories/screens/categories_screen.dart';
 
 /// Notifier to refresh GoRouter when auth state changes
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -23,6 +24,7 @@ class AppRouter {
   static const String login = '/login';
   static const String home = '/';
   static const String products = '/products';
+  static const String categories = '/categories';
   static const String cart = '/cart';
   static const String transactions = '/transactions';
   static const String settings = '/settings';
@@ -67,6 +69,12 @@ class AppRouter {
         name: 'products',
         pageBuilder: (context, state) =>
             MaterialPage(key: state.pageKey, child: const ProductsScreen()),
+      ),
+      GoRoute(
+        path: categories,
+        name: 'categories',
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: const CategoriesScreen()),
       ),
       GoRoute(
         path: cart,

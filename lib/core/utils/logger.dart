@@ -5,7 +5,7 @@ class Logger {
   static void log(String message, {String? tag}) {
     if (kDebugMode) {
       final tagPrefix = tag != null ? '[$tag] ' : '';
-      debugPrint('${tagPrefix}$message');
+      debugPrint('$tagPrefix$message');
     }
   }
 
@@ -21,14 +21,14 @@ class Logger {
   static void info(String message, {String? tag}) {
     if (kDebugMode) {
       final tagPrefix = tag != null ? '[$tag] ' : '';
-      debugPrint('ℹ️ ${tagPrefix}$message');
+      debugPrint('ℹ️ $tagPrefix$message');
     }
   }
 
   static void success(String message, {String? tag}) {
     if (kDebugMode) {
       final tagPrefix = tag != null ? '[$tag] ' : '';
-      debugPrint('✅ ${tagPrefix}$message');
+      debugPrint('✅ $tagPrefix$message');
     }
   }
 }
