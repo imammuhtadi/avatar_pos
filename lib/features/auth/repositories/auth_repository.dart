@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/config/supabase_config.dart';
+import 'package:avatar_pos/core/index.dart';
 
 /// Repository for authentication operations
 class AuthRepository {

@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/product.dart';
-import '../repositories/product_repository.dart';
+import 'package:avatar_pos/features/home/index.dart';
 
 /// Repository provider
 final productRepositoryProvider = Provider<ProductRepository>((ref) {

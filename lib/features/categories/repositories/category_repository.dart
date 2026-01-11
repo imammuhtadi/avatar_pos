@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/utils/logger.dart';
-import '../models/category.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/features/categories/index.dart';
 
 /// Repository for category operations
 class CategoryRepository {

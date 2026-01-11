@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../repositories/auth_repository.dart';
+import 'package:avatar_pos/features/auth/index.dart';
 
 /// Provider for auth repository
 final authRepositoryProvider = Provider<AuthRepository>((ref) {

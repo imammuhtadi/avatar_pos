@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../home/models/cart_item.dart';
-import '../../home/models/product.dart';
+import 'package:avatar_pos/features/home/index.dart';
 
 /// Cart state notifier - manages shopping cart
 class CartNotifier extends StateNotifier<List<CartItem>> {

@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/config/supabase_config.dart';
-import '../models/product.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/features/home/index.dart';
 
 /// Repository for product data operations with Supabase
 class ProductRepository {
