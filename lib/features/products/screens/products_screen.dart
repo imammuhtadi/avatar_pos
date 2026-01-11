@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../home/models/product.dart';
-import '../../home/providers/products_provider.dart';
-import '../../home/repositories/product_repository.dart';
-import 'product_form_screen.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/features/home/index.dart';
+import 'package:avatar_pos/features/products/index.dart';
 
 /// Products management screen
 class ProductsScreen extends ConsumerStatefulWidget {

@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/router/app_router.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../shared/widgets/app_drawer.dart';
-import '../providers/products_provider.dart';
-import '../../cart/providers/cart_provider.dart';
-import '../widgets/product_card.dart';
-import '../../cart/widgets/cart_panel.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/shared/index.dart';
+import 'package:avatar_pos/features/cart/index.dart';
+import 'package:avatar_pos/features/home/index.dart';
 
 /// Home screen - main dashboard for POS
 class HomeScreen extends ConsumerWidget {

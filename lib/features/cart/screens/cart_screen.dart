@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/cart_provider.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../checkout/screens/checkout_screen.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/features/checkout/index.dart';
+import 'package:avatar_pos/features/cart/index.dart';
 
 /// Modern cart screen with clean design
 class CartScreen extends ConsumerWidget {

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../home/models/product.dart';
-import '../../home/repositories/product_repository.dart';
-import '../../home/providers/products_provider.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/features/home/index.dart';
 
 /// Product form screen for adding or editing products
 class ProductFormScreen extends ConsumerStatefulWidget {

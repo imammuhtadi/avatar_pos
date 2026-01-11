@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/category.dart';
-import '../repositories/category_repository.dart';
-import 'categories_provider.dart';
+import 'package:avatar_pos/features/categories/index.dart';
 
 /// State for categories list
 class CategoriesState {

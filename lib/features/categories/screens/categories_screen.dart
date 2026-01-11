@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_theme.dart';
-import '../models/category.dart';
-import '../providers/categories_notifier.dart';
-import 'category_form_screen.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/features/categories/index.dart';
 
 /// Categories list screen
 class CategoriesScreen extends ConsumerWidget {

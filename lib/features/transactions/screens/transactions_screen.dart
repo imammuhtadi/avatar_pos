@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../checkout/models/transaction.dart';
-import '../providers/transactions_provider.dart';
-import 'transaction_detail_screen.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/features/checkout/index.dart';
+import 'package:avatar_pos/features/transactions/index.dart';
 
 /// Transactions list screen
 class TransactionsScreen extends ConsumerStatefulWidget {

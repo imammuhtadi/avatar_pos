@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/product.dart';
-import '../../cart/providers/cart_provider.dart';
-import '../../../core/theme/app_theme.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/features/cart/index.dart';
+import 'package:avatar_pos/features/home/index.dart';
 
 /// Modern, minimalist product card widget
 class ProductCard extends ConsumerWidget {

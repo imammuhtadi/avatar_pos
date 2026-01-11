@@ -1,9 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/config/supabase_config.dart';
-import '../models/transaction.dart';
-import '../models/transaction_item.dart';
-import '../../home/models/cart_item.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/features/home/index.dart';
+import 'package:avatar_pos/features/checkout/index.dart';
 
 /// Repository for checkout and transaction operations
 class CheckoutRepository {

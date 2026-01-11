@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/config/supabase_config.dart';
-import '../models/category.dart';
-import '../repositories/category_repository.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/features/categories/index.dart';
 
 /// Category repository provider
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {

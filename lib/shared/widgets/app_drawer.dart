@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/router/app_router.dart';
-import '../../core/theme/app_theme.dart';
-import '../../features/auth/providers/auth_provider.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/features/auth/index.dart';
 
 /// Modern, minimalist navigation drawer
 class AppDrawer extends ConsumerWidget {

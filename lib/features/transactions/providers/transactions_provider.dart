@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../checkout/models/transaction.dart';
-import '../../checkout/repositories/checkout_repository.dart';
+import 'package:avatar_pos/features/checkout/index.dart';
 
 /// Provider for checkout repository
 final checkoutRepositoryProvider = Provider<CheckoutRepository>((ref) {

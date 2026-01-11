@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../core/theme/app_theme.dart';
-import '../providers/transactions_provider.dart';
+import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/features/transactions/index.dart';
 
 /// Transaction detail screen
 class TransactionDetailScreen extends ConsumerWidget {
