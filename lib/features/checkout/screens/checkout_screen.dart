@@ -82,8 +82,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       }
     } catch (e, stackTrace) {
       // Log error to console for debugging
-      debugPrint('❌ Checkout Error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      Logger.error('Checkout error', tag: 'CheckoutScreen', error: e, stackTrace: stackTrace);
 
       if (mounted) {
         SnackBarUtils.showError(context, 'Checkout failed: $e');

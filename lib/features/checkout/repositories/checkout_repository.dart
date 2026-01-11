@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:avatar_pos/core/index.dart';
 import 'package:avatar_pos/features/home/index.dart';
@@ -22,17 +21,17 @@ class CheckoutRepository {
       // Get current user ID (cashier)
       // If no user is authenticated, use null (for testing without auth)
       final userId = _supabase.auth.currentUser?.id;
-      debugPrint('🔐 User ID: ${userId ?? "NULL (no auth)"}');
+      Logger.info('User ID: ${userId ?? "NULL (no auth)"}', tag: 'CheckoutRepository');
 
       // Prepare items for the function
       final items = cartItems
           .map((item) => {'product_id': item.product.id, 'quantity': item.quantity})
           .toList();
-      debugPrint('🛒 Cart items: ${items.length} items');
-      debugPrint('📦 Items data: $items');
+      Logger.info('Cart items: ${items.length} items', tag: 'CheckoutRepository');
+      Logger.info('Items data: $items', tag: 'CheckoutRepository');
 
       // Call the Supabase function
-      debugPrint('📞 Calling process_checkout function...');
+      Logger.info('Calling process_checkout function...', tag: 'CheckoutRepository');
       final response = await _supabase.rpc(
         'process_checkout',
         params: {
@@ -46,7 +45,7 @@ class CheckoutRepository {
           'p_notes': notes,
         },
       );
-      debugPrint('✅ Supabase response received');
+      Logger.success('Supabase response received', tag: 'CheckoutRepository');
 
       // Parse response
       final transactionData = response['transaction'] as Map<String, dynamic>;
@@ -61,11 +60,18 @@ class CheckoutRepository {
           .toList();
 
       // Return transaction with items
-      debugPrint('🎉 Transaction completed: ${transaction.transactionNumber}');
+      Logger.success(
+        'Transaction completed: ${transaction.transactionNumber}',
+        tag: 'CheckoutRepository',
+      );
       return transaction.copyWith(items: transactionItems);
     } catch (e, stackTrace) {
-      debugPrint('❌ Checkout Repository Error: $e');
-      debugPrint('Stack trace: $stackTrace');
+      Logger.error(
+        'Checkout repository error',
+        tag: 'CheckoutRepository',
+        error: e,
+        stackTrace: stackTrace,
+      );
       throw Exception('Failed to process checkout: $e');
     }
   }

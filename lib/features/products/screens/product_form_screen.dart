@@ -67,11 +67,11 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
 
   Future<void> _saveProduct() async {
     if (!_formKey.currentState!.validate()) {
-      debugPrint('❌ Form validation failed');
+      Logger.error('Form validation failed', tag: 'ProductForm');
       return;
     }
 
-    debugPrint('📝 ${_isEditMode ? "Updating" : "Creating"} product...');
+    Logger.info('${_isEditMode ? "Updating" : "Creating"} product...', tag: 'ProductForm');
     setState(() => _isLoading = true);
 
     try {
@@ -91,25 +91,24 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
         isActive: true,
       );
 
-      debugPrint('📦 Product data:');
-      debugPrint('   Name: ${productData.name}');
-      debugPrint('   Price: \$${productData.price}');
-      debugPrint('   Stock: ${productData.stock}');
-      debugPrint('   SKU: ${productData.sku ?? "N/A"}');
+      Logger.info(
+        'Product data: Name=${productData.name}, Price=${productData.price}, Stock=${productData.stock}, SKU=${productData.sku ?? "N/A"}',
+        tag: 'ProductForm',
+      );
 
       if (_isEditMode) {
-        debugPrint('🔄 Updating product ID: ${widget.product!.id}');
+        Logger.info('Updating product ID: ${widget.product!.id}', tag: 'ProductForm');
         await repository.updateProduct(widget.product!.id, productData);
-        debugPrint('✅ Product updated successfully');
+        Logger.success('Product updated successfully', tag: 'ProductForm');
       } else {
-        debugPrint('➕ Creating new product');
+        Logger.info('Creating new product', tag: 'ProductForm');
         final createdProduct = await repository.createProduct(productData);
-        debugPrint('✅ Product created with ID: ${createdProduct.id}');
+        Logger.success('Product created with ID: ${createdProduct.id}', tag: 'ProductForm');
       }
 
       // Refresh products list
       ref.invalidate(productsProvider);
-      debugPrint('🔄 Products list refreshed');
+      Logger.info('Products list refreshed', tag: 'ProductForm');
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -123,8 +122,12 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
         Navigator.of(context).pop(true);
       }
     } catch (e, stackTrace) {
-      debugPrint('❌ Error ${_isEditMode ? "updating" : "creating"} product: $e');
-      debugPrint('Stack trace: $stackTrace');
+      Logger.error(
+        'Error ${_isEditMode ? "updating" : "creating"} product',
+        tag: 'ProductForm',
+        error: e,
+        stackTrace: stackTrace,
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(

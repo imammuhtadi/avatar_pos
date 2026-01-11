@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:avatar_pos/core/index.dart';
 
@@ -15,17 +14,17 @@ class AuthRepository {
   /// Sign in with email and password
   Future<AuthResponse> signIn({required String email, required String password}) async {
     try {
-      debugPrint('🔐 Attempting sign in for: $email');
+      Logger.info('Attempting sign in for: $email', tag: 'AuthRepository');
 
       final response = await _supabase.auth.signInWithPassword(email: email, password: password);
 
       if (response.user != null) {
-        debugPrint('✅ Sign in successful: ${response.user!.email}');
+        Logger.success('Sign in successful: ${response.user!.email}', tag: 'AuthRepository');
       }
 
       return response;
     } catch (e) {
-      debugPrint('❌ Sign in error: $e');
+      Logger.error('Sign in error', tag: 'AuthRepository', error: e);
       rethrow;
     }
   }
@@ -37,7 +36,7 @@ class AuthRepository {
     String? fullName,
   }) async {
     try {
-      debugPrint('📝 Attempting sign up for: $email');
+      Logger.info('Attempting sign up for: $email', tag: 'AuthRepository');
 
       final response = await _supabase.auth.signUp(
         email: email,
@@ -46,12 +45,12 @@ class AuthRepository {
       );
 
       if (response.user != null) {
-        debugPrint('✅ Sign up successful: ${response.user!.email}');
+        Logger.success('Sign up successful: ${response.user!.email}', tag: 'AuthRepository');
       }
 
       return response;
     } catch (e) {
-      debugPrint('❌ Sign up error: $e');
+      Logger.error('Sign up error', tag: 'AuthRepository', error: e);
       rethrow;
     }
   }
@@ -59,11 +58,11 @@ class AuthRepository {
   /// Sign out
   Future<void> signOut() async {
     try {
-      debugPrint('🚪 Signing out user: ${currentUser?.email}');
+      Logger.info('Signing out user: ${currentUser?.email}', tag: 'AuthRepository');
       await _supabase.auth.signOut();
-      debugPrint('✅ Sign out successful');
+      Logger.success('Sign out successful', tag: 'AuthRepository');
     } catch (e) {
-      debugPrint('❌ Sign out error: $e');
+      Logger.error('Sign out error', tag: 'AuthRepository', error: e);
       rethrow;
     }
   }
@@ -74,11 +73,11 @@ class AuthRepository {
   /// Reset password
   Future<void> resetPassword(String email) async {
     try {
-      debugPrint('📧 Sending password reset email to: $email');
+      Logger.info('Sending password reset email to: $email', tag: 'AuthRepository');
       await _supabase.auth.resetPasswordForEmail(email);
-      debugPrint('✅ Password reset email sent');
+      Logger.success('Password reset email sent', tag: 'AuthRepository');
     } catch (e) {
-      debugPrint('❌ Password reset error: $e');
+      Logger.error('Password reset error', tag: 'AuthRepository', error: e);
       rethrow;
     }
   }
