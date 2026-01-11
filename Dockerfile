@@ -13,6 +13,9 @@ RUN flutter pub get
 # Copy the rest of the application
 COPY . .
 
+# Create .env from template if .env doesn't exist
+RUN if [ ! -f .env ]; then cp .env.template .env; fi
+
 # Build web app
 RUN flutter build web --release
 
