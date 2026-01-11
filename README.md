@@ -4,6 +4,7 @@ A modern Point of Sale system built with Flutter and Supabase. Runs on Android, 
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.8.1+-02569B?logo=flutter)](https://flutter.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?logo=supabase)](https://supabase.com)
+[![Live Demo](https://img.shields.io/badge/🎮_Live_Demo-Try_Now-FF6B6B?style=for-the-badge)](https://avatar_pos.muhtadi.dev/)
 
 ---
 
@@ -17,6 +18,23 @@ A modern Point of Sale system built with Flutter and Supabase. Runs on Android, 
 - 📦 Automatic stock management
 - 🎨 Light/dark theme support
 - 🌍 Cross-platform (Android, iOS, Web, Windows, macOS)
+
+---
+
+## 🎮 Live Demo
+
+Try out Avatar POS without any installation!
+
+**🌐 Web Demo:** [https://avatar_pos.muhtadi.dev/](https://avatar_pos.muhtadi.dev/)
+
+**Test Account:**
+
+```
+Email: test@mail.com
+Password: password
+```
+
+> **Note:** The demo uses a shared test database. Feel free to explore all features including adding products, creating transactions, and managing inventory!
 
 ---
 
