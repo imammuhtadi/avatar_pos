@@ -7,11 +7,41 @@ import 'package:avatar_pos/features/cart/index.dart';
 import 'package:avatar_pos/features/home/index.dart';
 
 /// Home screen - main dashboard for POS
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<Product> _filterProducts(List<Product> products) {
+    if (_searchQuery.isEmpty) {
+      return products;
+    }
+
+    final query = _searchQuery.toLowerCase();
+    return products.where((product) {
+      final matchesName = product.name.toLowerCase().contains(query);
+      final description = product.description;
+      final matchesDescription = description.toLowerCase().contains(query);
+      final sku = product.sku;
+      final matchesSku = sku != null && sku.toLowerCase().contains(query);
+      return matchesName || matchesDescription || matchesSku;
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final productsAsync = ref.watch(productsProvider);
     final cartItemCount = ref.watch(cartItemCountProvider);
 
@@ -23,8 +53,41 @@ class HomeScreen extends ConsumerWidget {
         return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
-            title: const Text('Products'),
+            title: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Search products...',
+                border: InputBorder.none,
+                hintStyle: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withOpacity(0.5)
+                      : Colors.black.withOpacity(0.5),
+                ),
+              ),
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+              ),
+            ),
             actions: [
+              // Clear search button
+              if (_searchQuery.isNotEmpty)
+                IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    setState(() {
+                      _searchController.clear();
+                      _searchQuery = '';
+                    });
+                  },
+                  tooltip: 'Clear search',
+                ),
               // Only show cart button on smaller screens
               if (!showCartPanel)
                 Padding(
@@ -84,21 +147,37 @@ class HomeScreen extends ConsumerWidget {
                   Expanded(
                     child: productsAsync.when(
                       data: (products) {
-                        if (products.isEmpty) {
+                        final filteredProducts = _filterProducts(products);
+
+                        if (filteredProducts.isEmpty) {
                           return Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  Icons.inventory_2_outlined,
+                                  _searchQuery.isEmpty
+                                      ? Icons.inventory_2_outlined
+                                      : Icons.search_off,
                                   size: 64,
                                   color: AppTheme.neutralDark,
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  'No products available',
+                                  _searchQuery.isEmpty
+                                      ? 'No products available'
+                                      : 'No products found',
                                   style: TextStyle(fontSize: 16, color: AppTheme.neutralDark),
                                 ),
+                                if (_searchQuery.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Try searching with different keywords',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: AppTheme.neutralDark.withOpacity(0.7),
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           );
@@ -139,9 +218,9 @@ class HomeScreen extends ConsumerWidget {
                                 crossAxisSpacing: 20,
                                 mainAxisSpacing: 20,
                               ),
-                              itemCount: products.length,
+                              itemCount: filteredProducts.length,
                               itemBuilder: (context, index) {
-                                return ProductCard(product: products[index]);
+                                return ProductCard(product: filteredProducts[index]);
                               },
                             );
                           },
