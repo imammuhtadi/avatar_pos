@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/core/utils/snackbar_utils.dart';
 import 'package:avatar_pos/features/checkout/index.dart';
 import 'package:avatar_pos/features/cart/index.dart';
 
@@ -42,21 +43,7 @@ class CartPanel extends ConsumerWidget {
                   TextButton.icon(
                     onPressed: () {
                       cart.clear();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Row(
-                            children: [
-                              Icon(Icons.check_circle, color: Colors.white, size: 20),
-                              SizedBox(width: 12),
-                              Text('Cart cleared'),
-                            ],
-                          ),
-                          backgroundColor: AppTheme.successColor,
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
+                      SnackBarUtils.showSuccess(context, 'Cart cleared');
                     },
                     icon: const Icon(Icons.delete_outline, size: 18),
                     label: const Text('Clear'),

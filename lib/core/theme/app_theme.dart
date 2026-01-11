@@ -102,6 +102,15 @@ class AppTheme {
 
     // Divider
     dividerTheme: const DividerThemeData(color: neutralMedium, thickness: 1, space: 1),
+
+    // SnackBar - Positioned at top, compact size
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      contentTextStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+      actionTextColor: Colors.white,
+      dismissDirection: DismissDirection.up,
+    ),
   );
 
   // Dark Theme - Modern and minimal
@@ -192,5 +201,14 @@ class AppTheme {
     ),
 
     dividerTheme: const DividerThemeData(color: Color(0xFF262626), thickness: 1, space: 1),
+
+    // SnackBar - Positioned at top, compact size
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      contentTextStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+      actionTextColor: Colors.white,
+      dismissDirection: DismissDirection.up,
+    ),
   );
 }

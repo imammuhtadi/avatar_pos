@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/core/utils/snackbar_utils.dart';
 import 'package:avatar_pos/features/cart/index.dart';
 import 'package:avatar_pos/features/home/index.dart';
 
@@ -29,21 +30,7 @@ class ProductCard extends ConsumerWidget {
           onTap: () {
             // Add to cart on tap
             ref.read(cartProvider.notifier).addProduct(product);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.check_circle, color: Colors.white, size: 20),
-                    const SizedBox(width: 12),
-                    Text('${product.name} added to cart'),
-                  ],
-                ),
-                backgroundColor: AppTheme.successColor,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                duration: const Duration(seconds: 2),
-              ),
-            );
+            SnackBarUtils.showSuccess(context, '${product.name} added to cart');
           },
           borderRadius: BorderRadius.circular(16),
           child: Column(

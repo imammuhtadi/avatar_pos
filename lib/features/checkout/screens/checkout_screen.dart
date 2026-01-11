@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/core/utils/snackbar_utils.dart';
 import 'package:avatar_pos/features/cart/index.dart';
 import 'package:avatar_pos/features/home/index.dart';
 import 'package:avatar_pos/features/checkout/index.dart';
@@ -43,7 +44,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     final cartItems = ref.read(cartProvider);
     if (cartItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cart is empty')));
+      SnackBarUtils.showWarning(context, 'Cart is empty');
       return;
     }
 
@@ -85,13 +86,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       debugPrint('Stack trace: $stackTrace');
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Checkout failed: $e'),
-            backgroundColor: AppTheme.errorColor,
-            duration: const Duration(seconds: 5),
-          ),
-        );
+        SnackBarUtils.showError(context, 'Checkout failed: $e');
       }
     } finally {
       if (mounted) {

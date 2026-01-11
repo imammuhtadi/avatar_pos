@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/snackbar_utils.dart';
 import '../providers/auth_provider.dart';
 
 /// Login screen for authentication
@@ -41,21 +42,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       if (mounted) {
         // Navigation will be handled by auth state listener
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login successful!'),
-            backgroundColor: AppTheme.successColor,
-          ),
-        );
+        SnackBarUtils.showSuccess(context, 'Login successful!');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Login failed: ${e.toString()}'),
-            backgroundColor: AppTheme.errorColor,
-          ),
-        );
+        SnackBarUtils.showError(context, 'Login failed: ${e.toString()}');
       }
     } finally {
       if (mounted) {
