@@ -5,14 +5,14 @@ FROM ghcr.io/cirruslabs/flutter:stable AS build
 ARG SUPABASE_URL
 ARG SUPABASE_ANON_KEY
 
+# Cache busting argument - pass current timestamp or commit hash to invalidate cache
+ARG CACHEBUST=1
+
 # Set working directory
 WORKDIR /app
 
 # Copy pubspec files
 COPY pubspec.* ./
-
-# Clean dependencies
-RUN flutter clean
 
 # Get dependencies
 RUN flutter pub get
@@ -24,8 +24,8 @@ COPY . .
 RUN echo "SUPABASE_URL=${SUPABASE_URL}" > .env && \
     echo "SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}" >> .env
 
-# Build web app
-RUN flutter build web --release
+# Clean and build web app (clean after copying to ensure fresh build)
+RUN flutter clean && flutter build web --release --no-tree-shake-icons
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine
