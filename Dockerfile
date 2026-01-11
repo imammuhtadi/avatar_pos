@@ -11,6 +11,9 @@ WORKDIR /app
 # Copy pubspec files
 COPY pubspec.* ./
 
+# Clean dependencies
+RUN flutter clean
+
 # Get dependencies
 RUN flutter pub get
 

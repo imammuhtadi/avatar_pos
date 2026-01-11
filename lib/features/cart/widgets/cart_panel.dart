@@ -78,7 +78,7 @@ class CartPanel extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Add product to get started',
+                        'Add products to get started',
                         style: TextStyle(
                           fontSize: 13,
                           color: AppTheme.neutralDark.withOpacity(0.7),
