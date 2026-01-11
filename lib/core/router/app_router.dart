@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../config/supabase_config.dart';
-import '../../features/auth/screens/login_screen.dart';
-import '../../features/home/screens/home_screen.dart';
-import '../../features/products/screens/products_screen.dart';
-import '../../features/cart/screens/cart_screen.dart';
-import '../../features/settings/screens/settings_screen.dart';
-import '../../features/transactions/screens/transactions_screen.dart';
-import '../../features/categories/screens/categories_screen.dart';
+import '../../features/auth/index.dart';
+import '../../features/cart/index.dart';
+import '../../features/categories/index.dart';
+import '../../features/home/index.dart';
+import '../../features/products/index.dart';
+import '../../features/settings/index.dart';
+import '../../features/transactions/index.dart';
 
 /// Notifier to refresh GoRouter when auth state changes
 class GoRouterRefreshStream extends ChangeNotifier {
