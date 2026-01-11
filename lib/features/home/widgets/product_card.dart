@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/product.dart';
-import '../providers/cart_provider.dart';
+import '../../cart/providers/cart_provider.dart';
 import '../../../core/theme/app_theme.dart';
 
 /// Modern, minimalist product card widget

@@ -5,7 +5,7 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/app_drawer.dart';
 import '../providers/products_provider.dart';
-import '../providers/cart_provider.dart';
+import '../../cart/providers/cart_provider.dart';
 import '../widgets/product_card.dart';
 import '../../cart/widgets/cart_panel.dart';
 
