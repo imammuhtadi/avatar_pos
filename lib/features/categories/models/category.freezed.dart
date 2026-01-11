@@ -26,8 +26,11 @@ mixin _$Category {
   String? get description => throw _privateConstructorUsedError;
   String? get icon => throw _privateConstructorUsedError;
   String? get color => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_active')
   bool get isActive => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Category to a JSON map.
@@ -51,9 +54,9 @@ abstract class $CategoryCopyWith<$Res> {
     String? description,
     String? icon,
     String? color,
-    bool isActive,
-    DateTime? createdAt,
-    DateTime? updatedAt,
+    @JsonKey(name: 'is_active') bool isActive,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
   });
 }
 
@@ -136,9 +139,9 @@ abstract class _$$CategoryImplCopyWith<$Res>
     String? description,
     String? icon,
     String? color,
-    bool isActive,
-    DateTime? createdAt,
-    DateTime? updatedAt,
+    @JsonKey(name: 'is_active') bool isActive,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
   });
 }
 
@@ -213,9 +216,9 @@ class _$CategoryImpl implements _Category {
     this.description,
     this.icon,
     this.color,
-    this.isActive = true,
-    this.createdAt,
-    this.updatedAt,
+    @JsonKey(name: 'is_active') this.isActive = true,
+    @JsonKey(name: 'created_at') this.createdAt,
+    @JsonKey(name: 'updated_at') this.updatedAt,
   });
 
   factory _$CategoryImpl.fromJson(Map<String, dynamic> json) =>
@@ -232,11 +235,13 @@ class _$CategoryImpl implements _Category {
   @override
   final String? color;
   @override
-  @JsonKey()
+  @JsonKey(name: 'is_active')
   final bool isActive;
   @override
+  @JsonKey(name: 'created_at')
   final DateTime? createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
 
   @override
@@ -298,9 +303,9 @@ abstract class _Category implements Category {
     final String? description,
     final String? icon,
     final String? color,
-    final bool isActive,
-    final DateTime? createdAt,
-    final DateTime? updatedAt,
+    @JsonKey(name: 'is_active') final bool isActive,
+    @JsonKey(name: 'created_at') final DateTime? createdAt,
+    @JsonKey(name: 'updated_at') final DateTime? updatedAt,
   }) = _$CategoryImpl;
 
   factory _Category.fromJson(Map<String, dynamic> json) =
@@ -317,10 +322,13 @@ abstract class _Category implements Category {
   @override
   String? get color;
   @override
+  @JsonKey(name: 'is_active')
   bool get isActive;
   @override
+  @JsonKey(name: 'created_at')
   DateTime? get createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   DateTime? get updatedAt;
 
   /// Create a copy of Category

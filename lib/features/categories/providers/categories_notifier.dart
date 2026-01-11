@@ -68,6 +68,21 @@ class CategoriesNotifier extends StateNotifier<CategoriesState> {
       rethrow;
     }
   }
+
+  Future<void> createCategory(Category category) async {
+    await _repository.createCategory(category);
+    await loadCategories();
+  }
+
+  Future<void> updateCategory(Category category) async {
+    await _repository.updateCategory(category);
+    await loadCategories();
+  }
+
+  Future<void> deleteCategory(String id) async {
+    await _repository.deleteCategory(id);
+    await loadCategories();
+  }
 }
 
 /// Provider for categories notifier

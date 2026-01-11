@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../models/category.dart';
-import '../providers/categories_provider.dart';
+import '../providers/categories_notifier.dart';
 
 /// Category form screen for creating and editing categories
 class CategoryFormScreen extends ConsumerStatefulWidget {
@@ -73,7 +73,7 @@ class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final repository = ref.read(categoryRepositoryProvider);
+      final notifier = ref.read(categoriesNotifierProvider.notifier);
       final category = Category(
         id: widget.category?.id ?? '',
         name: _nameController.text.trim(),
@@ -86,12 +86,10 @@ class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
       );
 
       if (widget.category == null) {
-        await repository.createCategory(category);
+        await notifier.createCategory(category);
       } else {
-        await repository.updateCategory(category);
+        await notifier.updateCategory(category);
       }
-
-      ref.invalidate(categoriesProvider);
 
       if (mounted) {
         Navigator.of(context).pop();
@@ -146,9 +144,8 @@ class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final repository = ref.read(categoryRepositoryProvider);
-      await repository.deleteCategory(widget.category!.id);
-      ref.invalidate(categoriesProvider);
+      final notifier = ref.read(categoriesNotifierProvider.notifier);
+      await notifier.deleteCategory(widget.category!.id);
 
       if (mounted) {
         Navigator.of(context).pop();

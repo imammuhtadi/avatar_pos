@@ -13,13 +13,13 @@ _$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String?,
       icon: json['icon'] as String?,
       color: json['color'] as String?,
-      isActive: json['isActive'] as bool? ?? true,
-      createdAt: json['createdAt'] == null
+      isActive: json['is_active'] as bool? ?? true,
+      createdAt: json['created_at'] == null
           ? null
-          : DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+          : DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
@@ -29,7 +29,7 @@ Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
       'description': instance.description,
       'icon': instance.icon,
       'color': instance.color,
-      'isActive': instance.isActive,
-      'createdAt': instance.createdAt?.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'is_active': instance.isActive,
+      'created_at': instance.createdAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };
