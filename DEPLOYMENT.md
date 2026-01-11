@@ -49,23 +49,29 @@ If using the webhook method:
 
 ### 4. Environment Variables
 
-Set these environment variables in Coolify:
+**IMPORTANT**: Flutter web apps bundle environment variables at **build time**, not runtime. Set these as **Build Arguments** in Coolify:
+
+#### In Coolify Dashboard:
+
+1. Go to your application → **Environment Variables**
+2. Add the following variables:
 
 ```bash
-# Supabase Configuration
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-
-# Optional: Environment
-NODE_ENV=production
+# Supabase Configuration (Build-time)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_supabase_anon_key_here
 ```
 
-**Important**: Update `lib/core/config/supabase_config.dart` to read from environment variables in production:
+These variables will be passed to Docker as build arguments and baked into the `.env` file during the build process.
 
-```dart
-// For web deployment, you may need to inject these at build time
-// or use a config file that's not committed to git
-```
+#### How It Works:
+
+1. **Build Time**: Coolify passes environment variables as Docker build arguments
+2. **Dockerfile**: Creates `.env` file with these values
+3. **Flutter Build**: Bundles `.env` into the web app
+4. **Runtime**: App reads from the bundled `.env` file
+
+**Note**: If you change environment variables, you must **rebuild** the application for changes to take effect.
 
 ### 5. Deploy
 

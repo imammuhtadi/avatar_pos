@@ -1,6 +1,10 @@
 # Stage 1: Build Flutter web app
 FROM ghcr.io/cirruslabs/flutter:stable AS build
 
+# Build arguments for environment variables
+ARG SUPABASE_URL
+ARG SUPABASE_ANON_KEY
+
 # Set working directory
 WORKDIR /app
 
@@ -13,8 +17,9 @@ RUN flutter pub get
 # Copy the rest of the application
 COPY . .
 
-# Create .env from template if .env doesn't exist
-RUN if [ ! -f .env ]; then cp .env.template .env; fi
+# Create .env file with build arguments
+RUN echo "SUPABASE_URL=${SUPABASE_URL}" > .env && \
+    echo "SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}" >> .env
 
 # Build web app
 RUN flutter build web --release
