@@ -13,7 +13,7 @@ class AppVersion {
   static const String buildDate = String.fromEnvironment('BUILD_DATE', defaultValue: 'unknown');
 
   /// Get full version string
-  static String get fullVersion => '$version+$buildNumber';
+  static String get fullVersion => '$version ($buildNumber)';
 
   /// Get version with commit hash
   static String get versionWithCommit {
