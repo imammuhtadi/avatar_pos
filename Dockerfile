@@ -8,6 +8,10 @@ ARG SUPABASE_ANON_KEY
 # Cache busting argument - pass current timestamp or commit hash to invalidate cache
 ARG CACHEBUST=1
 
+# Version information (optional - will be injected by CI/CD)
+ARG COMMIT_HASH=dev
+ARG BUILD_DATE=unknown
+
 # Set working directory
 WORKDIR /app
 
@@ -25,7 +29,10 @@ RUN echo "SUPABASE_URL=${SUPABASE_URL}" > .env && \
     echo "SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}" >> .env
 
 # Clean and build web app (clean after copying to ensure fresh build)
-RUN flutter clean && flutter build web --release --no-tree-shake-icons
+# Pass version info as dart-define for runtime access
+RUN flutter clean && flutter build web --release --no-tree-shake-icons \
+    --dart-define=COMMIT_HASH=${COMMIT_HASH} \
+    --dart-define=BUILD_DATE=${BUILD_DATE}
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine

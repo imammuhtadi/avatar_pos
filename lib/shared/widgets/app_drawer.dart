@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:avatar_pos/core/index.dart';
+import 'package:avatar_pos/core/utils/app_version.dart';
 import 'package:avatar_pos/features/auth/index.dart';
 
 /// Modern, minimalist navigation drawer
@@ -158,41 +159,59 @@ class AppDrawer extends ConsumerWidget {
                   ),
                 ),
               ),
-              child: userAsync.when(
-                loading: () => const SizedBox.shrink(),
-                error: (_, __) => const SizedBox.shrink(),
-                data: (user) {
-                  return Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: AppTheme.accentColor.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(Icons.person, size: 20, color: AppTheme.accentColor),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              user?.email ?? 'Guest',
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                              overflow: TextOverflow.ellipsis,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // User info
+                  userAsync.when(
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
+                    data: (user) {
+                      return Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: AppTheme.accentColor.withOpacity(0.1),
+                              shape: BoxShape.circle,
                             ),
-                            Text(
-                              'Signed in',
-                              style: TextStyle(fontSize: 12, color: AppTheme.successColor),
+                            child: Icon(Icons.person, size: 20, color: AppTheme.accentColor),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  user?.email ?? 'Guest',
+                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  'Signed in',
+                                  style: TextStyle(fontSize: 12, color: AppTheme.successColor),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                },
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Version info
+                  Text(
+                    AppVersion.displayVersion,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.neutralDark.withOpacity(0.6),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
