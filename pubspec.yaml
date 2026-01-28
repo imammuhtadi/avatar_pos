@@ -37,6 +37,9 @@ dependencies:
   # Environment Variables
   flutter_dotenv: ^5.1.0
 
+  # Web APIs (for web platform only)
+  web: ^1.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

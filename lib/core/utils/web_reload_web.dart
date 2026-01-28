@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
+import 'dart:js_interop';
 
 /// Web implementation for reload functionality
 /// This file is only used when building for web platform
@@ -9,7 +9,7 @@ class WebReload {
 
   static void hardReload() {
     if (kIsWeb) {
-      html.window.location.reload();
+      web.window.location.reload();
     }
   }
 
@@ -17,26 +17,24 @@ class WebReload {
     if (kIsWeb) {
       try {
         // Unregister service workers
-        final registrations = await html.window.navigator.serviceWorker?.getRegistrations();
-        if (registrations != null) {
-          for (final registration in registrations) {
-            await registration.unregister();
-          }
+        final serviceWorker = web.window.navigator.serviceWorker;
+        final registrations = await serviceWorker.getRegistrations().toDart;
+        for (var i = 0; i < registrations.length; i++) {
+          await registrations[i].unregister().toDart;
         }
 
         // Clear cache storage
-        final cacheNames = await html.window.caches?.keys();
-        if (cacheNames != null) {
-          for (final cacheName in cacheNames) {
-            await html.window.caches?.delete(cacheName);
-          }
+        final caches = web.window.caches;
+        final cacheNames = await caches.keys().toDart;
+        for (var i = 0; i < cacheNames.length; i++) {
+          await caches.delete(cacheNames[i].toDart).toDart;
         }
       } catch (e) {
         // Ignore errors, just reload anyway
       }
 
       // Hard reload
-      html.window.location.reload();
+      web.window.location.reload();
     }
   }
 }
