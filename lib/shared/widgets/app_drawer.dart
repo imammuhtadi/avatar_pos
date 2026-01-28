@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:avatar_pos/core/index.dart';
 import 'package:avatar_pos/core/utils/app_version.dart';
+import 'package:avatar_pos/core/utils/web_reload.dart';
 import 'package:avatar_pos/features/auth/index.dart';
 
 /// Modern, minimalist navigation drawer
@@ -202,14 +204,52 @@ class AppDrawer extends ConsumerWidget {
 
                   const SizedBox(height: 12),
 
-                  // Version info
-                  Text(
-                    AppVersion.displayVersion,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppTheme.neutralDark.withOpacity(0.6),
-                      fontWeight: FontWeight.w500,
-                    ),
+                  // Version info with reload button (web only)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        AppVersion.displayVersion,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppTheme.neutralDark.withOpacity(0.6),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (kIsWeb)
+                        InkWell(
+                          onTap: () {
+                            // Show confirmation dialog
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Reload App'),
+                                content: const Text(
+                                  'This will reload the app and clear all cached data to get the latest version. Continue?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  FilledButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      WebReload.clearCacheAndReload();
+                                    },
+                                    child: const Text('Reload'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(6),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4),
+                            child: Icon(Icons.refresh, size: 16, color: AppTheme.accentColor),
+                          ),
+                        ),
+                    ],
                   ),
                 ],
               ),

@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart';
 /// App version information
 class AppVersion {
   // Version from pubspec.yaml
-  static const String version = '1.0.0';
-  static const String buildNumber = '1';
+  static const String version = '1.1.0';
+  static const String buildNumber = '2';
 
   // Git commit hash (will be injected during build)
   static const String commitHash = String.fromEnvironment('COMMIT_HASH', defaultValue: 'dev');
