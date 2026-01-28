@@ -61,7 +61,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 });
               },
               decoration: InputDecoration(
-                hintText: 'Search products....',
+                hintText: 'Search products...',
                 border: InputBorder.none,
                 hintStyle: TextStyle(
                   color: Theme.of(context).brightness == Brightness.dark
